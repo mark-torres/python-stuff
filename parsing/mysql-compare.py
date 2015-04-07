@@ -51,6 +51,17 @@ def compare_table(src_table, dst_table):
 	table_diff["changed"] = changed
 	return table_diff
 
+def print_change(table_change):
+	fields = table_change.keys();
+	for field in fields:
+		print("- - - - - - - - - - - %s - - - - - - - - - - -" % field);
+		field_changes = table_change[field].keys();
+		for field_change in field_changes:
+			print("Modify: %s" % field_change)
+			print("%s -> %s" % \
+				(table_change[field][field_change]["dst"],table_change[field][field_change]["src"]))
+			print("")
+
 # =====================================
 # = GET PARAMETERS AND READ SQL FILES =
 # =====================================
@@ -131,13 +142,11 @@ for table in common_tables:
 	to_del = table_diffs[table]["to_del"]
 	to_add = table_diffs[table]["to_add"]
 	if len(changed) > 0:
-		print(changed)
-	print("\n")
+		print_change(changed)
+	print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =")
 print("- - - - - - - - - - - - - - - - - - - - - - - ")
 print("TO DELETE (IN DESTINATION BUT NOT IN SOURCE):")
 print(tables_to_delete)
 print("- - - - - - - - - - - - - - - - - - - - - - - ")
 print("TO CREATE (IN SOURCE BUT NOT IN DESTINATION):")
 print(tables_to_create)
-
-
