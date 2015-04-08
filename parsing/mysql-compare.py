@@ -51,6 +51,11 @@ def compare_table(src_table, dst_table):
 	table_diff["changed"] = changed
 	return table_diff
 
+def print_field(field_name, field_data):
+	print("- - - - - - - - - - - %s - - - - - - - - - - -" % field_name);
+	print("   Type: %s" % field_data["type"])
+	print("Options: %s" % field_data["options"])
+
 def print_change(table_change):
 	fields = table_change.keys();
 	for field in fields:
@@ -142,11 +147,22 @@ for table in common_tables:
 	to_del = table_diffs[table]["to_del"]
 	to_add = table_diffs[table]["to_add"]
 	if len(changed) > 0:
+		print("* * * * * FIELDS TO MODIFY:")
 		print_change(changed)
+	if len(to_add) > 0:
+		print("* * * * * FIELDS TO ADD:")
+		for field in to_add:
+			print_field(field, src_tables[table]["fields"][field])
+	if len(to_del) > 0:
+		print("* * * * * FIELDS TO DELETE:")
+		for field in to_add:
+			print_field(field, dst_tables[table]["fields"][field])
 	print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =")
-print("- - - - - - - - - - - - - - - - - - - - - - - ")
-print("TO DELETE (IN DESTINATION BUT NOT IN SOURCE):")
-print(tables_to_delete)
-print("- - - - - - - - - - - - - - - - - - - - - - - ")
-print("TO CREATE (IN SOURCE BUT NOT IN DESTINATION):")
-print(tables_to_create)
+if len(tables_to_delete) > 0:
+	print("- - - - - - - - - - - - - - - - - - - - - - - ")
+	print("TO DELETE (IN DESTINATION BUT NOT IN SOURCE):")
+	print(tables_to_delete)
+if len(tables_to_create) > 0:
+	print("- - - - - - - - - - - - - - - - - - - - - - - ")
+	print("TO CREATE (IN SOURCE BUT NOT IN DESTINATION):")
+	print(tables_to_create)
