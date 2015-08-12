@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys, re
 
 # =============
@@ -52,20 +53,25 @@ def compare_table(src_table, dst_table):
 	return table_diff
 
 def print_field(field_name, field_data):
-	print("- - - - - - - - - - - %s - - - - - - - - - - -" % field_name);
-	print("   Type: %s" % field_data["type"])
-	print("Options: %s" % field_data["options"])
+	fstring = "%-20s | %-13s | %-40s"
+	print(fstring % (field_name, field_data["type"], field_data["options"]))
 
 def print_change(table_change):
-	fields = table_change.keys();
+	fields = table_change.keys()
+	fstring = "%-20s | %-13s | %-40s | %-40s"
+	print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 + '+' + '-'*41 )
+	print(fstring % ('FIELD NAME', 'CHANGE TYPE', 'CURRENT', 'UPDATED'))
 	for field in fields:
-		print("- - - - - - - - - - - %s - - - - - - - - - - -" % field);
-		field_changes = table_change[field].keys();
+		field_changes = table_change[field].keys()
+		field_name = field
 		for field_change in field_changes:
-			print("Modify: %s" % field_change)
-			print("%s -> %s" % \
-				(table_change[field][field_change]["dst"],table_change[field][field_change]["src"]))
-			print("")
+			if field_name != '':
+				print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 + '+' + '-'*41 )
+			print(fstring % \
+				(field_name, field_change, table_change[field][field_change]["dst"], table_change[field][field_change]["src"]))
+			field_name = ''
+	print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 + '+' + '-'*41 )
+	print("")
 
 # =====================================
 # = GET PARAMETERS AND READ SQL FILES =
@@ -139,25 +145,37 @@ tables_to_delete = dst_set.difference(src_set)
 tables_to_create = src_set.difference(dst_set)
 table_diffs = {}
 
+print("")
 print("CHANGED (COMMON TABLES):")
 for table in common_tables:
 	table_diffs[table] = compare_table(src_tables[table], dst_tables[table])
-	print(table)
 	changed = table_diffs[table]["changed"]
 	to_del = table_diffs[table]["to_del"]
 	to_add = table_diffs[table]["to_add"]
-	if len(changed) > 0:
-		print("* * * * * FIELDS TO MODIFY:")
-		print_change(changed)
-	if len(to_add) > 0:
-		print("* * * * * FIELDS TO ADD:")
-		for field in to_add:
-			print_field(field, src_tables[table]["fields"][field])
-	if len(to_del) > 0:
-		print("* * * * * FIELDS TO DELETE:")
-		for field in to_add:
-			print_field(field, dst_tables[table]["fields"][field])
-	print("= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =")
+	if len(changed) or len(to_add) or len(to_del):
+		print("%s %s" % ('#'*30, table))
+		fstring = "%-20s | %-13s | %-40s"
+		if len(changed) > 0:
+			print("FIELDS TO MODIFY")
+			print_change(changed)
+		if len(to_add) > 0:
+			print("FIELDS TO ADD")
+			print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 )
+			print(fstring % ('FIELD NAME', 'TYPE', 'OPTIONS'))
+			print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 )
+			for field in to_add:
+				print_field(field, src_tables[table]["fields"][field])
+			print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 )
+		if len(to_del) > 0:
+			print("FIELDS TO DELETE")
+			print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 )
+			print(fstring % ('FIELD NAME', 'TYPE', 'OPTIONS'))
+			print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 )
+			for field in to_del:
+				print_field(field, dst_tables[table]["fields"][field])
+			print( '-'*21 + '+' + '-'*15 + '+' + '-'*42 )
+		print("")
+print("")
 if len(tables_to_delete) > 0:
 	print("- - - - - - - - - - - - - - - - - - - - - - - ")
 	print("TO DELETE (IN DESTINATION BUT NOT IN SOURCE):")
