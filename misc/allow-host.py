@@ -18,8 +18,10 @@ if len(sys.argv[1:]) > 0:
 	ip = sys.argv[1]
 else:
 	print "No IP provided. Nothing to do"
+	print ""
+	print "Add host IP to allowed hosts"
 	print "Usage: "
-	print sys.argv[0]
+	print sys.argv[0] + " HOST_IP [sshd|ftpd|http|https]"
 	exit()
 	
 if len(sys.argv[2:]) > 0:
