@@ -1,4 +1,4 @@
-#! python3
+#! /usr/local/bin/python3
 
 # read number
 def readint(message):
@@ -18,9 +18,9 @@ def collatz(number):
 	"""collatz sequence"""
 	result = 0
 	if number % 2 == 0:
-		result = int(number / 2)
+		result = number // 2
 	if number % 2 == 1:
-		result = int(3 * number + 1)
+		result = 3 * number + 1
 	print( str(result) )
 	return result
 
