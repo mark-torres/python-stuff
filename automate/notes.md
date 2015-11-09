@@ -1,4 +1,3 @@
-
 # Notes from *Automate the Boring Stuff with Python*
 
 * [Python Basics](#ch01)
@@ -229,7 +228,7 @@ Return Values and return Statements
 
 In Python there is a value called `None`, which represents the absence of a value. `None` is the only value of the `NoneType` data type. (Other programming languages might call this value `null`, `nil`, or `undefined`.) Just like the Boolean `True` and `False` values, `None` must be typed with a capital *N*.
 
-This value-without-a-value can be helpful when you need to store something that won’t be confused for a real value in a variable.
+This value-without-a-value can be helpful when you need to store something that won't be confused for a real value in a variable.
 
 ### Keyword Arguments and `print()`
 
@@ -388,7 +387,7 @@ A list value looks like this:
 	>>> spam[:]
 	['cat', 'bat', 'rat', 'elephant']
 
-**Getting a list’s length with `len()`**
+**Getting a list's length with `len()`**
 
 	>>> spam = ['cat', 'dog', 'moose']
 	>>> len(spam)
@@ -614,7 +613,7 @@ Lists assignments work differently from the other value assignments. When you as
 	>>> cheese
 	[0, 'Hello!', 2, 3, 4, 5]
 
-**The `copy` module’s `copy()` and `deepcopy()` functions**
+**The `copy` module's `copy()` and `deepcopy()` functions**
 
 Python provides a module named `copy` that provides both the `copy()` and `deepcopy()` functions. The first of these, `copy.copy()`, can be used to make a duplicate copy of a mutable value like a list or dictionary, not just a copy of a reference.
 
@@ -631,11 +630,579 @@ If the list you need to copy contains lists, then use the `copy.deepcopy()` func
 
 ## Dictionaries and Structuring Data <a name="ch05">&nbsp;</a>
 
+### The Dictionary Data Type
+
+Like a list, a dictionary is a collection of many values. But unlike indexes for lists, indexes for dictionaries can use many different data types, not just integers. Indexes for dictionaries are called keys, and a key with its associated value is called a key-value pair.
+
+	>>> myCat = {'size': 'fat', 'color': 'gray', 'disposition': 'loud'}
+	>>> myCat['size']
+	'fat'
+	>>> 'My cat has ' + myCat['color'] + ' fur.'
+	'My cat has gray fur.'
+	>>> spam = {12345: 'Luggage Combination', 42: 'The Answer'}
+
+### Dictionaries vs. Lists
+
+Unlike lists, items in dictionaries are unordered. The first item in a list named spam would be `spam[0]`. But there is no "first" item in a dictionary. While the order of items matters for determining whether two lists are the same, it does not matter in what order the key-value pairs are typed in a dictionary.
+
+	>>> spam = ['cats', 'dogs', 'moose']
+	>>> bacon = ['dogs', 'moose', 'cats']
+	>>> spam == bacon
+	False
+	>>> eggs = {'name': 'Zophie', 'species': 'cat', 'age': '8'}
+	>>> ham = {'species': 'cat', 'age': '8', 'name': 'Zophie'}
+	>>> eggs == ham
+	True
+
+Because dictionaries are not ordered, they can't be sliced like lists.
+
+### The `keys()`, `values()`, and `items()` Methods
+
+There are three dictionary methods that will return list-like values of the dictionary's keys, values, or both keys and values: `keys()`, `values()`, and `items()`. The values returned by these methods are not true lists: They cannot be modified and do not have an `append()` method.
+
+	>>> spam = {'color': 'red', 'age': 42}
+	>>> for v in spam.values():
+			print(v)
+	red
+	42
+	>>> for k in spam.keys():
+			print(k)
+	color
+	age
+	>>> for i in spam.items():
+			print(i)
+	('color', 'red')
+	('age', 42)
+
+### Checking Whether a Key or Value Exists in a Dictionary
+
+	>>> spam = {'name': 'Zophie', 'age': 7}
+	>>> 'name' in spam.keys()
+	True
+	>>> 'Zophie' in spam.values()
+	True
+	>>> 'color' in spam.keys()
+	False
+	>>> 'color' not in spam.keys()
+	True
+	>>> 'color' in spam
+	False
+
+### The `get()` Method
+
+Dictionaries have a get() method that takes two arguments: the key of the value to retrieve and a fallback value to return if that key does not exist.
+
+	>>> picnicItems = {'apples': 5, 'cups': 2}
+	>>> 'I am bringing ' + str(picnicItems.get('cups', 0)) + ' cups.'
+	'I am bringing 2 cups.'
+	>>> 'I am bringing ' + str(picnicItems.get('eggs', 0)) + ' eggs.'
+	'I am bringing 0 eggs.'
+
+### The `setdefault()` Method
+
+You'll often have to set a value in a dictionary for a certain key only if that key does not already have a value.
+
+	spam = {'name': 'Pooka', 'age': 5}
+	if 'color' not in spam:
+		spam['color'] = 'black'
+	# using the setdefault method
+	>>> spam = {'name': 'Pooka', 'age': 5}
+	>>> spam.setdefault('color', 'black')
+	'black'
+	>>> spam
+	{'color': 'black', 'age': 5, 'name': 'Pooka'}
+
 ## Manipulating Strings <a name="ch06">&nbsp;</a>
+
+### Escape Characters
+
+	>>> spam = 'Say hi to Bob\'s mother.'
+
+These are the escape characters you can use:
+
+Escape character | Prints as
+---- | ----
+\' | Single quote
+\" | Double quote
+\t | Tab
+\n | Newline (line break)
+\\\ | Backslash
+
+	>>> print("Hello there!\nHow are you?\nI\'m doing fine.")
+	Hello there!
+	How are you?
+	I'm doing fine.
+
+### Raw Strings
+
+You can place an `r` before the beginning quotation mark of a string to make it a raw string. A raw string completely ignores all escape characters and prints any backslash that appears in the string.
+
+	>>> print(r'That is Carol\'s cat.')
+	That is Carol\'s cat.
+
+### Multiline Strings with Triple Quotes
+
+A multiline string in Python begins and ends with either three single quotes or three double quotes. Any quotes, tabs, or newlines in between the "triple quotes" are considered part of the string. Python’s indentation rules for blocks do not apply to lines inside a multiline string.
+
+### Multiline Comments
+
+While the hash character (#) marks the beginning of a comment for the rest of the line, a multiline string is often used for comments that span multiple lines.
+
+	"""This is a test Python program.
+	Written by Al Sweigart al@inventwithpython.com
+	
+	This program was designed for Python 3, not Python 2.
+	"""
+	def spam():
+		"""This is a multiline comment to help
+		explain what the spam() function does."""
+		print('Hello!')
+
+### Indexing and Slicing Strings
+
+Strings use indexes and slices the same way lists do.
+
+	>>> spam = 'Hello world!'
+	>>> spam[0]
+	'H'
+	>>> spam[4]
+	'o'
+	>>> spam[-1]
+	'!'
+	>>> spam[0:5]
+	'Hello'
+	>>> spam[:5]
+	'Hello'
+	>>> spam[6:]
+	'world!'
+
+### The in and not in Operators with Strings
+
+The `in` and `not in` operators can be used with strings just like with list values.
+
+	>>> 'Hello' in 'Hello World'
+	True
+	>>> 'Hello' in 'Hello'
+	True
+	>>> 'HELLO' in 'Hello World'
+	False
+	>>> '' in 'spam'
+	True
+	>>> 'cats' not in 'cats and dogs'
+	False
+
+### Useful string methods
+
+**The upper(), lower(), isupper(), and islower() String Methods**
+
+Several string methods analyze strings or create transformed string values.
+
+	>>> spam = 'Hello world!'
+	>>> spam = spam.upper()
+	>>> spam
+	'HELLO WORLD!'
+	>>> spam = spam.lower()
+	>>> spam
+	'hello world!'
+	>>> spam = 'Hello world!'
+	>>> spam.islower()
+	False
+	>>> spam.isupper()
+	False
+	>>> 'HELLO'.isupper()
+	True
+	>>> 'abc12345'.islower()
+	True
+	>>> '12345'.islower()
+	False
+	>>> '12345'.isupper()
+	False
+
+**The isX String Methods**
+
+Here are some common isX string methods:
+
+* `isalpha()`: returns True if the string consists only of letters and is not blank.
+* `isalnum()`: returns True if the string consists only of letters and numbers and is not blank.
+* `isdecimal()`: returns True if the string consists only of numeric characters and is not blank.
+* `isspace()`: returns True if the string consists only of spaces, tabs, and new-lines and is not blank.
+* `istitle()`: returns True if the string consists only of words that begin with an uppercase letter followed by only lowercase letters.
+
+The isX string methods are helpful when you need to validate user input. 
+
+	>>> 'hello'.isalpha()
+	True
+	>>> 'hello123'.isalpha()
+	False
+	>>> 'hello123'.isalnum()
+	True
+	>>> 'hello'.isalnum()
+	True
+	>>> '123'.isdecimal()
+	True
+	>>> '    '.isspace()
+	True
+	>>> 'This Is Title Case'.istitle()
+	True
+	>>> 'This Is Title Case 123'.istitle()
+	True
+	>>> 'This Is not Title Case'.istitle()
+	False
+	>>> 'This Is NOT Title Case Either'.istitle()
+	False
+
+**The `startswith()` and `endswith()` String Methods**
+
+	>>> 'Hello world!'.startswith('Hello')
+	True
+	>>> 'Hello world!'.endswith('world!')
+	True
+	>>> 'abc123'.startswith('abcdef')
+	False
+	>>> 'abc123'.endswith('12')
+	False
+	>>> 'Hello world!'.startswith('Hello world!')
+	True
+	>>> 'Hello world!'.endswith('Hello world!')
+	True
+
+**The `join()` and `split()` String Methods**
+
+	>>> ', '.join(['cats', 'rats', 'bats'])
+	'cats, rats, bats'
+	>>> ' '.join(['My', 'name', 'is', 'Simon'])
+	'My name is Simon'
+	>>> 'ABC'.join(['My', 'name', 'is', 'Simon'])
+	'MyABCnameABCisABCSimon'
+
+**Justifying Text with `rjust()`, `ljust()`, and `center()`**
+
+	>>> 'Hello'.rjust(10)
+	'     Hello'
+	>>> 'Hello'.rjust(20)
+	'               Hello'
+	>>> 'Hello World'.rjust(20)
+	'         Hello World'
+	>>> 'Hello'.ljust(10)
+	'Hello
+	>>> 'Hello'.rjust(20, '*')
+	'***************Hello'
+	>>> 'Hello'.ljust(20, '-')
+	'Hello---------------'
+	>>> 'Hello'.center(20)
+	'       Hello       '
+	>>> 'Hello'.center(20, '=')
+	'=======Hello========'
+
+**Removing Whitespace with `strip()`, `rstrip()`, and `lstrip()`**
+
+	>>> spam = '    Hello World     '
+	>>> spam.strip()
+	'Hello World'
+	>>> spam.lstrip()
+	'Hello World '
+	>>> spam.rstrip()
+	'    Hello World'
+	>>> spam = 'SpamSpamBaconSpamEggsSpamSpam'
+	>>> spam.strip('ampS')
+	'BaconSpamEggs'
+
+### Copying and Pasting Strings with the pyperclip Module
+
+The pyperclip module has copy() and paste() functions that can send text to and receive text from your computer’s clipboard.
+
+	>>> import pyperclip
+	>>> pyperclip.copy('Hello world!')
+	>>> pyperclip.paste()
+	'Hello world!'
+
+If you copy some text into the clipboard, you can "pase" it into a variable:
+
+	>>> text = pyperclip.paste()
+	>>> text
+	'Some text from clipboard'
 
 ## Pattern Matching with Regular Expressions <a name="ch07">&nbsp;</a>
 
+### Creating Regex Objects
+
+All the regex functions in Python are in the re module.
+
+	>>> import re
+	>>> phoneNumRegex = re.compile(r'\d\d\d-\d\d\d-\d\d\d\d')
+
+Since regular expressions frequently use backslashes in them, it is convenient to pass raw strings to the `re.compile()` function instead of typing extra backslashes. Typing r'\d\d\d-\d\d\d-\d\d\d\d' is much easier than typing '\\d\\d\\d-\\d\\d\\d-\\d\\d\\d\\d'.
+
+### Matching Regex Objects
+
+A Regex object’s `search()` method searches the string it is passed for any matches to the regex. The `search()` method will return `None` if the regex pattern is not found in the string. If the pattern is found, the `search()` method returns a `Match` object. Match objects have a `group()` method that will return the actual matched text from the searched string.
+
+	>>> phoneNumRegex = re.compile(r'\d\d\d-\d\d\d-\d\d\d\d')
+	>>> mo = phoneNumRegex.search('My number is 415-555-4242.')
+	>>> print('Phone number found: ' + mo.group())
+	Phone number found: 415-555-4242
+
+**Grouping with Parentheses**
+
+	>>> phoneNumRegex = re.compile(r'(\d\d\d)-(\d\d\d-\d\d\d\d)')
+	>>> mo = phoneNumRegex.search('My number is 415-555-4242.')
+	>>> mo.group(1)
+	'415'
+	>>> mo.group(2)
+	'555-4242'
+	>>> mo.group(0)
+	'415-555-4242'
+	>>> mo.group()
+	'415-555-4242'
+	>>> mo.groups()
+	('415', '555-4242')
+	>>> areaCode, mainNumber = mo.groups()
+	>>> print(areaCode)
+	415
+	>>> print(mainNumber)
+	555-4242
+
+### Greedy and Nongreedy Matching
+
+Python’s regular expressions are greedy by default, which means that in ambiguous situations they will match the longest string possible. The non-greedy version of the curly brackets, which matches the shortest string possible, has the closing curly bracket followed by a question mark.
+
+	>>> greedyHaRegex = re.compile(r'(Ha){3,5}')
+	>>> mo1 = greedyHaRegex.search('HaHaHaHaHa')
+	>>> mo1.group()
+	'HaHaHaHaHa'
+	>>> nongreedyHaRegex = re.compile(r'(Ha){3,5}?')
+	>>> mo2 = nongreedyHaRegex.search('HaHaHaHaHa')
+	>>> mo2.group()
+	'HaHaHa'
+
+### The `findall()` Method
+
+In addition to the `search()` method, Regex objects also have a `findall()` method. While `search()` will return a Match object of the first matched text in the searched string, the `findall()` method will return the strings of every match in the searched string.
+
+	>>> phoneNumRegex = re.compile(r'\d\d\d-\d\d\d-\d\d\d\d')
+	>>> mo = phoneNumRegex.search('Cell: 415-555-9999 Work: 212-555-0000')
+	>>> mo.group()
+	'415-555-9999'
+	>>> phoneNumRegex = re.compile(r'\d\d\d-\d\d\d-\d\d\d\d') # has no groups
+	>>> phoneNumRegex.findall('Cell: 415-555-9999 Work: 212-555-0000')
+	['415-555-9999', '212-555-0000']
+	>>> phoneNumRegex = re.compile(r'(\d\d\d)-(\d\d\d)-(\d\d\d\d)') # has groups
+	>>> phoneNumRegex.findall('Cell: 415-555-9999 Work: 212-555-0000')
+	[('415', '555', '9999'), ('212', '555', '0000')]
+
+### The Wildcard Character
+
+The . (or dot) character in a regular expression is called a wildcard and will match any character except for a newline.
+
+**Matching Newlines with the Dot Character**
+
+The dot-star will match everything except a newline. By passing `re.DOTALL` as the second argument to `re.compile()`, you can make the dot character match all characters, including the newline character.
+
+	>>> noNewlineRegex = re.compile('.*')
+	>>> noNewlineRegex.search('Serve the public trust.\nProtect the innocent.
+	\nUphold the law.').group()
+	'Serve the public trust.'
+	>>> newlineRegex = re.compile('.*', re.DOTALL)
+	>>> newlineRegex.search('Serve the public trust.\nProtect the innocent.
+	\nUphold the law.').group()
+	'Serve the public trust.\nProtect the innocent.\nUphold the law.'
+
+### Case-Insensitive Matching
+
+Normally, regular expressions match text with the exact casing you specify. But sometimes you care only about matching the letters without worrying whether they’re uppercase or lowercase. To make your regex case-insensitive, you can pass `re.IGNORECASE` or `re.I` as a second argument to `re.compile()`.
+
+	>>> robocop = re.compile(r'robocop', re.I)
+	>>> robocop.search('Robocop is part man, part machine, all cop.').group()
+	'Robocop'
+	>>> robocop.search('ROBOCOP protects the innocent.').group()
+	'ROBOCOP'
+	>>> robocop.search('Al, why does your programming book talk about robocop so much?').group()
+	'robocop'
+
+### Substituting Strings with the `sub()` Method
+
+Regular expressions can not only find text patterns but can also substitute new text in place of those patterns. The `sub()` method for Regex objects is passed two arguments. The first argument is a string to replace any matches. The second is the string for the regular expression. The `sub()` method returns a string with the substitutions applied.
+
+	>>> namesRegex = re.compile(r'Agent \w+')
+	>>> namesRegex.sub('CENSORED', 'Agent Alice gave the secret documents to Agent Bob.')
+	'CENSORED gave the secret documents to CENSORED.'
+
+Sometimes you may need to use the matched text itself as part of the substitution. In the first argument to `sub()`, you can type \1, \2, \3, and so on, to mean "Enter the text of group 1, 2, 3, and so on, in the substitution".
+
+	>>> agentNamesRegex = re.compile(r'Agent (\w)\w*')
+	>>> agentNamesRegex.sub(r'\1****', 'Agent Alice told Agent Carol that Agent
+	Eve knew Agent Bob was a double agent.')
+	A**** told C**** that E**** knew B**** was a double agent.'
+
+### Managing Complex Regexes
+
+Regular expressions are fine if the text pattern you need to match is simple. But matching complicated text patterns might require long, convoluted regular expressions. You can mitigate this by telling the `re.compile()` function to ignore whitespace and comments inside the regular expression string. This "verbose mode" can be enabled by passing the variable `re.VERBOSE` as the second argument to `re.compile()`.
+
+	phoneRegex = re.compile(r'''(
+		(\d{3}|\(\d{3}\))?            # area code
+		(\s|-|\.)?                    # separator
+		\d{3}                         # first 3 digits
+		(\s|-|\.)                     # separator
+		\d{4}                         # last 4 digits
+		(\s*(ext|x|ext.)\s*\d{2,5})?  # extension
+		)''', re.VERBOSE)
+
+### Combining re.IGNORECASE, re.DOTALL, and re.VERBOSE
+
+If you want a regular expression that’s case-insensitive and includes newlines to match the dot character, you would form your `re.compile()` call like this:
+
+	>>> someRegexValue = re.compile('foo', re.IGNORECASE | re.DOTALL | re.VERBOSE)
+
 ## Reading and Writing Files <a name="ch08">&nbsp;</a>
+
+### Files and File Paths
+
+**Backslash on Windows and Forward Slash on OS X and Linux**
+
+On Windows, paths are written using backslashes (\\) as the separator between folder names. OS X and Linux, however, use the forward slash (/) as their path separator. If you want your programs to work on all operating systems, you will have to write your Python scripts to handle both cases.
+
+Fortunately, this is simple to do with the os.path.join() function:
+
+	>>> import os
+	>>> os.path.join('usr', 'bin', 'spam')
+	'usr\\bin\\spam'
+
+this was from a Windows machine, from a Unix machine, it would be:
+
+	>>> os.path.join('usr', 'bin', 'spam')
+	'usr/bin/spam'
+
+**The Current Working Directory**
+
+	>>> import os
+	>>> os.getcwd()
+	'C:\\Python34'
+	>>> os.chdir('C:\\Windows\\System32')
+	>>> os.getcwd()
+	'C:\\Windows\\System32'
+
+**Creating New Folders with `os.makedirs()`**
+
+Your programs can create new folders (directories) with the `os.makedirs()` function.
+
+	>>> import os
+	>>> os.makedirs('C:\\delicious\\walnut\\waffles')
+
+This will create not just the *C:\delicious* folder but also a *walnut* folder inside *C:\delicious* and a *waffles* folder inside *C:\delicious\walnut*. That is, `os.makedirs()` will create any necessary intermediate folders in order to ensure that the full path exists.
+
+### The `os.path` Module
+
+**Handling Absolute and Relative Paths**
+
+The os.path module provides functions for returning the absolute path of a relative path and for checking whether a given path is an absolute path.
+
+	>>> os.path.abspath('.')
+	'C:\\Python34'
+	>>> os.path.abspath('.\\Scripts')
+	'C:\\Python34\\Scripts'
+	>>> os.path.isabs('.')
+	False
+	>>> os.path.isabs(os.path.abspath('.'))
+	True
+	>>> os.path.relpath('C:\\Windows', 'C:\\')
+	'Windows'
+	>>> os.path.relpath('C:\\Windows', 'C:\\spam\\eggs')
+	'..\\..\\Windows'
+	>>> os.getcwd()
+	'C:\\Python34'
+	>>> path = 'C:\\Windows\\System32\\calc.exe'
+	>>> os.path.basename(path)
+	'calc.exe'
+	>>> os.path.dirname(path)
+	'C:\\Windows\\System32'
+	>>> calcFilePath = 'C:\\Windows\\System32\\calc.exe'
+	>>> os.path.split(calcFilePath)
+	('C:\\Windows\\System32', 'calc.exe')
+
+**Finding File Sizes and Folder Contents**
+
+Once you have ways of handling file paths, you can then start gathering information about specific files and folders.
+
+	>>> os.path.getsize('C:\\Windows\\System32\\calc.exe')
+	776192
+	>>> os.listdir('C:\\Windows\\System32')
+	['0409', '12520437.cpx', '12520850.cpx', '5U877.ax', 'aaclient.dll',
+	--snip--
+	'xwtpdui.dll', 'xwtpw32.dll', 'zh-CN', 'zh-HK', 'zh-TW', 'zipfldr.dll']
+
+**Checking Path Validity**
+
+Many Python functions will crash with an error if you supply them with a path that does not exist. The `os.path` module provides functions to check whether a given path exists and whether it is a file or folder.
+
+	>>> os.path.exists('C:\\Windows')
+	True
+	>>> os.path.exists('C:\\some_made_up_folder')
+	False
+	>>> os.path.isdir('C:\\Windows\\System32')
+	True
+	>>> os.path.isfile('C:\\Windows\\System32')
+	False
+	>>> os.path.isdir('C:\\Windows\\System32\\calc.exe')
+	False
+	>>> os.path.isfile('C:\\Windows\\System32\\calc.exe')
+	True
+
+### The File Reading/Writing Process
+
+**Opening Files with the open() Function**
+
+	>>> helloFile = open('C:\\Users\\your_home_folder\\hello.txt')
+
+Optionally, you can specify the open mode, for example: `r` for read-only.
+
+	>>> helloFile = open('C:\\Users\\your_home_folder\\hello.txt', 'r')
+
+**Reading the Contents of Files**
+
+	>>> helloContent = helloFile.read()
+	>>> helloContent
+	'Hello world!'
+	>>> sonnetFile = open('sonnet29.txt')
+	>>> sonnetFile.readlines()
+	[When, in disgrace with fortune and men's eyes,\n', ' I all alone beweep my
+	outcast state,\n', And trouble deaf heaven with my bootless cries,\n', And
+	look upon myself and curse my fate,']
+
+**Writing to Files**
+
+You can't write to a file you've opened in read mode, though. Instead, you need to open it in "write plaintext" mode or "append plaintext" mode, or write mode and append mode for short.
+
+	>>> baconFile = open('bacon.txt', 'w')
+	>>> baconFile.write('Hello world!\n')
+	13
+	>>> baconFile.close()
+	>>> baconFile = open('bacon.txt', 'a')
+	>>> baconFile.write('Bacon is not a vegetable.')
+	25
+	>>> baconFile.close()
+	>>> baconFile = open('bacon.txt')
+	>>> content = baconFile.read()
+	>>> baconFile.close()
+	>>> print(content)
+	Hello world!
+	Bacon is not a vegetable.
+
+### Saving Variables with the shelve Module
+
+You can save variables in your Python programs to binary shelf files using the `shelve` module. This way, your program can restore data to variables from the hard drive. The shelve module will let you add Save and Open features to your program.
+
+	>>> import shelve
+	>>> shelfFile = shelve.open('mydata')
+	>>> cats = ['Zophie', 'Pooka', 'Simon']
+	>>> shelfFile['cats'] = cats
+	>>> shelfFile.close()
+
+After you save the values, you can recover them:
+
+	>>> shelfFile = shelve.open('mydata')
+	>>> shelfFile['cats']
+	['Zophie', 'Pooka', 'Simon']
+	>>> shelfFile.close()
 
 ## Organizing Files <a name="ch09">&nbsp;</a>
 
