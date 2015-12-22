@@ -1206,6 +1206,120 @@ After you save the values, you can recover them:
 
 ## Organizing Files <a name="ch09">&nbsp;</a>
 
+### The shutil module
+
+The `shutil` (or shell utilities) module has functions to let you copy, move, rename, and delete files in your Python programs. To use the `shutil` functions, you will first need to use:
+
+	import shutil
+
+**Copying files and folders**
+
+	>>> import shutil, os
+	>>> os.chdir('C:\\')
+	>>> shutil.copy('C:\\spam.txt', 'C:\\delicious')
+	'C:\\delicious\\spam.txt'
+	>>> shutil.copy('eggs.txt', 'C:\\delicious\\eggs2.txt')
+	'C:\\delicious\\eggs2.txt'
+
+While `shutil.copy()` will copy a single file, `shutil.copytree()` will copy an entire folder and every folder and file contained in it.
+
+	>>> import shutil, os
+	>>> os.chdir('C:\\')
+	>>> shutil.copytree('C:\\bacon', 'C:\\bacon_backup')
+	'C:\\bacon_backup'
+
+**Moving and Renaming Files and Folders**
+
+	>>> import shutil
+	>>> shutil.move('C:\\bacon.txt', 'C:\\eggs')
+	'C:\\eggs\\bacon.txt'
+
+Move and rename:
+
+	>>> shutil.move('C:\\bacon.txt', 'C:\\eggs\\new_bacon.txt')
+	'C:\\eggs\\new_bacon.txt'
+
+The folders that make up the destination must already exist, or else Python will throw an exception.
+
+**Permanently Deleting Files and Folders**
+
+Be careful when using these functions in your programs! It’s often a good idea to first run your program with these calls commented out and with print() calls added to show the files that would be deleted.
+
+	import os
+	for filename in os.listdir():
+		if filename.endswith('.rxt'):
+			#os.unlink(filename)
+			print('File to delete: '+filename)
+
+**Safe Deletes with the send2trash Module**
+
+Since Python’s built-in `shutil.rmtree()` function irreversibly deletes files and folders, it can be dangerous to use. A much better way to delete files and folders is with the third-party `send2trash` module. You can install this module by running `pip install send2trash` from a Terminal window.
+
+	>>> import send2trash
+	>>> baconFile = open('bacon.txt', 'a') # creates the file
+	>>> baconFile.write('Bacon is not a vegetable.')
+	25
+	>>> baconFile.close()
+	>>> send2trash.send2trash('bacon.txt')
+
+### Walking a Directory Tree
+
+Here is an example program that uses the `os.walk()` function:
+
+	import os
+	
+	for folderName, subfolders, filenames in os.walk('C:\\delicious'):
+		print('The current folder is ' + folderName)
+	
+		for subfolder in subfolders:
+			print('SUBFOLDER OF ' + folderName + ': ' + subfolder)
+		for filename in filenames:
+			print('FILE INSIDE ' + folderName + ': '+ filename)
+	
+		print('')
+
+### Compressing Files with the zipfile Module
+
+**Reading ZIP Files**
+
+	>>> import zipfile, os
+	>>> os.chdir('C:\\')    # move to the folder with example.zip
+	>>> exampleZip = zipfile.ZipFile('example.zip')
+	>>> exampleZip.namelist()
+	['spam.txt', 'cats/', 'cats/catnames.txt', 'cats/zophie.jpg']
+	>>> spamInfo = exampleZip.getinfo('spam.txt')
+	>>> spamInfo.file_size
+	13908
+	>>> spamInfo.compress_size
+	3828
+	>>> 'Compressed file is %sx smaller!' % (round(spamInfo.file_size / spamInfo
+	.compress_size, 2))
+	'Compressed file is 3.63x smaller!'
+	>>> exampleZip.close()
+
+**Extracting from ZIP Files**
+
+	>>> import zipfile, os
+	>>> os.chdir('C:\\')    # move to the folder with example.zip
+	>>> exampleZip = zipfile.ZipFile('example.zip')
+	>>> exampleZip.extractall()
+	>>> exampleZip.close()
+
+The `extract()` method for ZipFile objects will extract a single file from the ZIP file:
+
+	>>> exampleZip.extract('spam.txt')
+	'C:\\spam.txt'
+	>>> exampleZip.extract('spam.txt', 'C:\\some\\new\\folders')
+	'C:\\some\\new\\folders\\spam.txt'
+	>>> exampleZip.close()
+
+**Creating and Adding to ZIP Files**
+
+	>>> import zipfile
+	>>> newZip = zipfile.ZipFile('new.zip', 'w')
+	>>> newZip.write('spam.txt', compress_type=zipfile.ZIP_DEFLATED)
+	>>> newZip.close()
+
 ## Debugging <a name="ch10">&nbsp;</a>
 
 ## Web Scraping <a name="ch11">&nbsp;</a>
