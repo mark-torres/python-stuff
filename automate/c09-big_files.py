@@ -1,4 +1,4 @@
-import shutil, os, argparse
+import os, argparse
 
 parser = argparse.ArgumentParser(description='Find and optionally remove big files.')
 parser.add_argument('--dir', dest='targetDir', required=True, nargs=1, help='Target directory')
