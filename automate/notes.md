@@ -1322,6 +1322,91 @@ The `extract()` method for ZipFile objects will extract a single file from the Z
 
 ## Debugging <a name="ch10">&nbsp;</a>
 
+### Raising Exceptions
+
+Python raises an exception whenever it tries to execute invalid code. Exceptions are raised with a `raise` statement. In code, a `raise` statement consists of the following:
+
+* The `raise` keyword
+* A call to the `Exception()` function
+* A string with a helpful error message passed to the `Exception()` function
+
+Example:
+
+	>>> raise Exception('This is the error message.')
+	Traceback (most recent call last):
+		File "<pyshell#191>", line 1, in <module>
+		raise Exception('This is the error message.')
+	Exception: This is the error message.
+
+### Assertions
+
+An assertion is a sanity check to make sure your code isn’t doing something obviously wrong. These sanity checks are performed by assert statements. If the sanity check fails, then an AssertionError exception is raised. In code, an assert statement consists of the following:
+
+* The `assert` keyword
+* A condition (that is, an expression that evaluates to `True` or `False`)
+* A comma
+* A string to display when the condition is `False`
+
+For example:
+
+	>>> podBayDoorStatus = 'open'
+	>>> assert podBayDoorStatus == 'open', 'The pod bay doors need to be "open".'
+	>>> podBayDoorStatus = 'I\'m sorry, Dave. I\'m afraid I can't do that.''
+	>>> assert podBayDoorStatus == 'open', 'The pod bay doors need to be "open".'
+	Traceback (most recent call last):
+	  File "<pyshell#10>", line 1, in <module>
+	    assert podBayDoorStatus == 'open', 'The pod bay doors need to be "open".'
+	AssertionError: The pod bay doors need to be "open".
+
+### Logging
+
+**Using the logging Module**
+
+To enable the logging module to display log messages on your screen as your program runs, copy the following to the top of your program (but under the `#!` python shebang line):
+
+	import logging
+	logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
+
+**Logging Levels**
+
+*Logging levels* provide a way to categorize your log messages by importance. There are five logging levels, described below from least to most important. Messages can be logged at each level using a different logging function.
+
+Level | Logging Function | Description
+--- | --- | ---
+`DEBUG` | `logging.debug()` | The lowest level. Used for small details. Usually you care about these messages only when diagnosing problems.
+`INFO` | `logging.info()` | Used to record information on general events in your program or confirm that things are working at their point in the program.
+`WARNING` | `logging.warning()` | Used to indicate a potential problem that doesn’t prevent the program from working but might do so in the future.
+`ERROR` | `logging.error()` | Used to record an error that caused the program to fail to do something.
+`CRITICAL` | `logging.critical()` | The highest level. Used to indicate a fatal error that has caused or is about to cause the program to stop running entirely.
+
+	>>> import logging
+	>>> logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+	>>> logging.debug('Some debugging details.')
+	2015-05-18 19:04:26,901 - DEBUG - Some debugging details.
+	>>> logging.info('The logging module is working.')
+	2015-05-18 19:04:35,569 - INFO - The logging module is working.
+	>>> logging.warning('An error message is about to be logged.')
+	2015-05-18 19:04:56,843 - WARNING - An error message is about to be logged.
+	>>> logging.error('An error has occurred.')
+	2015-05-18 19:05:07,737 - ERROR - An error has occurred.
+	>>> logging.critical('The program is unable to recover!')
+	2015-05-18 19:05:45,794 - CRITICAL - The program is unable to recover!
+
+**Disabling Logging**
+
+After you’ve debugged your program, you probably don’t want all these log messages cluttering the screen. The `logging.disable()` function disables these so that you don’t have to go into your program and remove all the logging calls by hand. You simply pass `logging.disable()` a logging level, and it will suppress all log messages at that level or lower. So if you want to disable logging entirely, just add `logging.disable(logging.CRITICAL)` to your program.
+
+Since `logging.disable()` will disable all messages after it, you will probably want to add it near the `import logging` line of code in your program. This way, you can easily find it to comment out or uncomment that call to enable or disable logging messages as needed.
+
+**Logging to a File**
+
+Instead of displaying the log messages to the screen, you can write them to a text file. The `logging.basicConfig()` function takes a filename keyword argument, like so:
+
+	import logging
+	logging.basicConfig(filename='myProgramLog.txt', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+The log messages will be saved to `myProgramLog.txt`. 
+
 ## Web Scraping <a name="ch11">&nbsp;</a>
 
 ## Working with Excel Spreadsheets <a name="ch12">&nbsp;</a>
