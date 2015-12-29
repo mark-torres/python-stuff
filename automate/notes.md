@@ -1409,6 +1409,8 @@ The log messages will be saved to `myProgramLog.txt`.
 
 ## Web Scraping <a name="ch11">&nbsp;</a>
 
+
+
 ## Working with Excel Spreadsheets <a name="ch12">&nbsp;</a>
 
 ## Working with PDF and Word Documents <a name="ch13">&nbsp;</a>
