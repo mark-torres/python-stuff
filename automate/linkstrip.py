@@ -11,17 +11,8 @@ args = parser.parse_args()
 
 siteUrl = args.siteUrl[0] if (args.siteUrl != None) else None
 
-try:
-	html = pyperclip.paste()
-except Exception as e:
-	print('Error reading from clipboard. Make sure the pyperclip module is installed.')
-	sys.exit()
-
-try:
-	parser = bs4.BeautifulSoup(html, "html.parser")
-except Exception as e:
-	print('Error parsing HTML. Make sure bs4 module is installed.')
-	sys.exit()
+html = pyperclip.paste()
+parser = bs4.BeautifulSoup(html, "html.parser")
 
 links = parser.select('a')
 if len(links) > 0:

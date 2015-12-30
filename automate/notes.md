@@ -1409,7 +1409,250 @@ The log messages will be saved to `myProgramLog.txt`.
 
 ## Web Scraping <a name="ch11">&nbsp;</a>
 
+Modules to use:
 
+* Webbrowser. Comes with Python and opens a browser to a specific page.
+* Requests. Downloads files and web pages from the Internet.
+* Beautiful Soup. Parses HTML, the format that web pages are written in.
+* Selenium. Launches and controls a web browser. Selenium is able to fill in forms and simulate mouse clicks in this browser.
+
+**The `webbrowser` module**
+
+The webbrowser module’s open() function can launch a new browser to a specified URL:
+
+	>>> import webbrowser
+	>>> webbrowser.open('http://inventwithpython.com/')
+
+This is about the only thing the webbrowser module can do.
+
+### Downloading Files from the Web with the requests Module
+
+**Downloading a Web Page with the requests.get() Function**
+
+	>>> import requests
+	>>> res = requests.get('https://automatetheboringstuff.com/files/rj.txt')
+	>>> type(res)
+	<class 'requests.models.Response'>
+	>>> res.status_code == requests.codes.ok
+	True
+	>>> len(res.text)
+	178981
+	>>> print(res.text[:250])
+	The Project Gutenberg EBook of Romeo and Juliet, by William Shakespeare
+
+**Checking for Errors**
+
+As you’ve seen, the Response object has a `status_code` attribute that can be checked against `requests.codes.ok` to see whether the download succeeded. A simpler way to check for success is to call the `raise_for_status()` method on the Response object. This will raise an exception if there was an error downloading the file and will do nothing if the download succeeded.
+
+	>>> res = requests.get('http://inventwithpython.com/page_that_does_not_exist')
+	>>> res.raise_for_status()
+	Traceback (most recent call last):
+		File "<pyshell#138>", line 1, in <module>
+			res.raise_for_status()
+		File "C:\Python34\lib\site-packages\requests\models.py", line 773, in raise_for_status
+			raise HTTPError(http_error_msg, response=self)
+	requests.exceptions.HTTPError: 404 Client Error: Not Found
+
+The `raise_for_status()` method is a good way to ensure that a program halts if a bad download occurs. If a failed download isn’t a deal breaker for your program, you can wrap the `raise_for_status()` line with `try` and `except` statements to handle this error case without crashing.
+
+	import requests
+	res = requests.get('http://inventwithpython.com/page_that_does_not_exist')
+	try:
+		res.raise_for_status()
+	except Exception as exc:
+		print('There was a problem: %s' % (exc))
+
+### Saving Downloaded Files to the Hard Drive
+
+You can save the web page to a file on your hard drive with the standard `open()` function and `write()` method but you must open the file in write binary mode by passing the string 'wb' as the second argument to `open()`. Even if the page is in plaintext you need to write binary data instead of text data in order to maintain the Unicode encoding of the text.
+
+To write the web page to a file, you can use a for loop with the `Response` object’s `iter_content()` method.
+
+	>>> import requests
+	>>> res = requests.get('https://automatetheboringstuff.com/files/rj.txt')
+	>>> res.raise_for_status()
+	>>> playFile = open('RomeoAndJuliet.txt', 'wb')
+	>>> for chunk in res.iter_content(100000):
+			playFile.write(chunk)
+	100000
+	78981
+	>>> playFile.close()
+
+The `iter_content()` method returns "chunks" of the content on each iteration through the loop. Each chunk is of the bytes data type, and you get to specify how many bytes each chunk will contain. One hundred thousand bytes is generally a good size, so pass 100000 as the argument to `iter_content()`.
+
+### Parsing HTML with the BeautifulSoup Module
+
+**Creating a BeautifulSoup Object from HTML**
+
+From a web page:
+
+	>>> import requests, bs4
+	>>> res = requests.get('http://nostarch.com')
+	>>> res.raise_for_status()
+	>>> noStarchSoup = bs4.BeautifulSoup(res.text)
+	>>> type(noStarchSoup)
+	<class 'bs4.BeautifulSoup'>
+
+From local file:
+
+	>>> exampleFile = open('example.html')
+	>>> exampleSoup = bs4.BeautifulSoup(exampleFile)
+	>>> type(exampleSoup)
+	<class 'bs4.BeautifulSoup'>
+
+**Finding an Element with the select() Method**
+
+You can retrieve a web page element from a `BeautifulSoup` object by calling the `select()` method and passing a string of a CSS selector for the element you are looking for.
+
+Examples of CSS Selectors:
+
+Selector passed to the select() method | Will match...
+--- | ---
+`soup.select('div')` | All elements named `<div>`
+`soup.select('#author')` | The element with an id attribute of author
+`soup.select('.notice')` | All elements that use a CSS class attribute named `notice`
+`soup.select('div span')` | All elements named `<span>` that are within an element named `<div>`
+`soup.select('div > span')` | All elements named `<span>` that are directly within an element named `<div>`, with no other element in between
+`soup.select('input[name]')` | All elements named `<input>` that have a name attribute with any value
+`soup.select('input[type="button"]')` | All elements named `<input>` that have an attribute named type with value button
+
+	>>> import bs4
+	>>> exampleFile = open('example.html')
+	>>> exampleSoup = bs4.BeautifulSoup(exampleFile.read())
+	>>> elems = exampleSoup.select('#author')
+	>>> type(elems)
+	<class 'list'>
+	>>> len(elems)
+	1
+	>>> type(elems[0])
+	<class 'bs4.element.Tag'>
+	>>> elems[0].getText()
+	'Al Sweigart'
+	>>> str(elems[0])
+	'<span id="author">Al Sweigart</span>'
+	>>> elems[0].attrs
+	{'id': 'author'}
+
+**Getting Data from an Element’s Attributes**
+
+	>>> import bs4
+	>>> soup = bs4.BeautifulSoup(open('example.html'))
+	>>> spanElem = soup.select('span')[0]
+	>>> str(spanElem)
+	'<span id="author">Al Sweigart</span>'
+	>>> spanElem.get('id')
+	'author'
+	>>> spanElem.get('some_nonexistent_addr') == None
+	True
+	>>> spanElem.attrs
+	{'id': 'author'}
+
+### Controlling the Browser with the selenium Module
+
+The selenium module lets Python directly control the browser by programmatically clicking links and filling in login information, almost as though there is a human user interacting with the page.
+
+**Starting a Selenium-Controlled Browser**
+
+For these examples, you’ll need the Firefox web browser.
+
+	>>> from selenium import webdriver
+	>>> browser = webdriver.Firefox()
+	>>> type(browser)
+	<class 'selenium.webdriver.firefox.webdriver.WebDriver'>
+	>>> browser.get('http://inventwithpython.com')
+
+**Finding Elements on the Page**
+
+WebDriver objects have quite a few methods for finding elements on a page. They are divided into the `find_element_*` and `find_elements_*` methods. The `find_element_*` methods return a single WebElement object, representing the first element on the page that matches your query. The `find_elements_*` methods return a list of `WebElement_*` objects for every matching element on the page.
+
+Selenium’s WebDriver Methods for Finding Elements:
+
+Method name | WebElement object/list returned
+--- | ---
+`browser.find_element_by_class_name(name)` & `browser.find_elements_by_class_name(name)` | Elements that use the CSS class name
+`browser.find_element_by_css_selector(selector)` & `browser.find_elements_by_css_selector(selector)` | Elements that match the CSS selector
+`browser.find_element_by_id(id)` & `browser.find_elements_by_id(id)` | Elements with a matching `id` attribute value
+`browser.find_element_by_link_text(text)` & `browser.find_elements_by_link_text(text)` | `<a>` elements that completely match the `text` provided
+`browser.find_element_by_partial_link_text(text)` & `browser.find_elements_by_partial_link_text(text)` | `<a>` elements that contain the `text` provided
+`browser.find_element_by_name(name)` & `browser.find_elements_by_name(name)` | Elements with a matching `name` attribute value
+`browser.find_element_by_tag_name(name)` & `browser.find_elements_by_tag_name(name)` | Elements with a matching tag `name` (case insensitive; an `<a>` element is matched by 'a' and 'A')
+
+Except for the *_by_tag_name() methods, the arguments to all the methods are case sensitive. If no elements exist on the page that match what the method is looking for, the selenium module raises a `NoSuchElement` exception.
+
+WebElement Attributes and Methods
+
+Attribute or method | Description
+--- | ---
+`tag_name` | The tag name, such as 'a' for an `<a>` element
+`get_attribute(name)` | The value for the element’s name attribute
+`text` | The text within the element, such as 'hello' in `<span>hello</span>`
+`clear()` | For text field or text area elements, clears the text typed into it
+`is_displayed()` | Returns `True` if the element is visible; otherwise returns `False`
+`is_enabled()` | For `input` elements, returns `True` if the element is enabled; otherwise returns `False`
+`is_selected()` | For checkbox or radio button elements, returns `True` if the element is selected; otherwise returns `False`
+`location` | A dictionary with keys 'x' and 'y' for the position of the element in the page
+
+Example:
+
+	from selenium import webdriver
+	browser = webdriver.Firefox()
+	browser.get('http://inventwithpython.com')
+	try:
+		elem = browser.find_element_by_class_name('bookcover')
+		print('Found <%s> element with that class name!' % (elem.tag_name))
+	except:
+		print('Was not able to find an element with that name.')
+
+**Clicking the Page**
+
+	>>> from selenium import webdriver
+	>>> browser = webdriver.Firefox()
+	>>> browser.get('http://inventwithpython.com')
+	>>> linkElem = browser.find_element_by_link_text('Read It Online')
+	>>> type(linkElem)
+	<class 'selenium.webdriver.remote.webelement.WebElement'>
+	>>> linkElem.click() # follows the "Read It Online" link
+
+**Filling Out and Submitting Forms**
+
+	>>> from selenium import webdriver
+	>>> browser = webdriver.Firefox()
+	>>> browser.get('https://mail.yahoo.com')
+	>>> emailElem = browser.find_element_by_id('login-username')
+	>>> emailElem.send_keys('not_my_real_email')
+	>>> passwordElem = browser.find_element_by_id('login-passwd')
+	>>> passwordElem.send_keys('12345')
+	>>> passwordElem.submit()
+
+**Sending Special Keys**
+
+Commonly Used Variables in the selenium.webdriver.common.keys Module
+
+Attributes | Meanings
+--- | ---
+`Keys.DOWN`, `Keys.UP`, `Keys.LEFT`, `Keys.RIGHT` | The keyboard arrow keys
+`Keys.ENTER`, `Keys.RETURN` | The `ENTER` and `RETURN` keys
+`Keys.HOME`, `Keys.END`, `Keys.PAGE_DOWN`, `Keys.PAGE_UP` | The home, end, pagedown, and pageup keys
+`Keys.ESCAPE`, `Keys.BACK_SPACE`, `Keys.DELETE` | The `ESC`, `BACKSPACE`, and `DELETE` keys
+`Keys.F1`, `Keys.F2`,..., `Keys.F12` | The `F1` to `F12` keys at the top of the keyboard
+`Keys.TAB` | The `TAB` key
+
+Example:
+
+	>>> from selenium import webdriver
+	>>> from selenium.webdriver.common.keys import Keys
+	>>> browser = webdriver.Firefox()
+	>>> browser.get('http://nostarch.com')
+	>>> htmlElem = browser.find_element_by_tag_name('html')
+	>>> htmlElem.send_keys(Keys.END)     # scrolls to bottom
+	>>> htmlElem.send_keys(Keys.HOME)    # scrolls to top
+
+**Clicking Browser Buttons**
+
+* `browser.back()`.- Clicks the Back button.
+* `browser.forward()`.- Clicks the Forward button.
+* `browser.refresh()`.- Clicks the Refresh/Reload button.
+* `browser.quit()`.- Clicks the Close Window button.
 
 ## Working with Excel Spreadsheets <a name="ch12">&nbsp;</a>
 
