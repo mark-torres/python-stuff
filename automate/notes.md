@@ -1656,6 +1656,311 @@ Example:
 
 ## Working with Excel Spreadsheets <a name="ch12">&nbsp;</a>
 
+The `openpyxl` module allows your Python programs to read and modify Excel spreadsheet files.
+
+	pip install openpyxl
+
+### Reading Excel Documents
+
+**Opening Excel Documents with OpenPyXL**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> type(wb)
+	<class 'openpyxl.workbook.workbook.Workbook'>
+
+**Getting Sheets from the Workbook**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> wb.get_sheet_names()
+	['Sheet1', 'Sheet2', 'Sheet3']
+	>>> sheet = wb.get_sheet_by_name('Sheet3')
+	>>> sheet
+	<Worksheet "Sheet3">
+	>>> type(sheet) <class 'openpyxl.worksheet.worksheet.Worksheet'>
+	>>> sheet.title
+	'Sheet3'
+	>>> anotherSheet = wb.get_active_sheet()
+	>>> anotherSheet
+	<Worksheet "Sheet1">
+
+**Getting Cells from the Sheets**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> sheet = wb.get_sheet_by_name('Sheet1')
+	>>> sheet['A1']
+	<Cell Sheet1.A1>
+	>>> sheet['A1'].value
+	datetime.datetime(2015, 4, 5, 13, 34, 2)
+	>>> c = sheet['B1']
+	>>> c.value
+	'Apples'
+	>>> 'Row ' + str(c.row) + ', Column ' + c.column + ' is ' + c.value
+	'Row 1, Column B is Apples'
+	>>> 'Cell ' + c.coordinate + ' is ' + c.value
+	'Cell B1 is Apples'
+	>>> sheet['C1'].value
+	73
+
+Specifying a column by letter can be tricky to program, especially because after column Z, the columns start by using two letters: AA, AB, AC, and so on. As an alternative, you can also get a cell using the sheet’s `cell()` method and passing integers for its row and column keyword arguments. The first row or column integer is 1, not 0.
+
+	>>> sheet.cell(row=1, column=2)
+	<Cell Sheet1.B1>
+	>>> sheet.cell(row=1, column=2).value
+	'Apples'
+	>>> for i in range(1, 8, 2):
+		print(i, sheet.cell(row=i, column=2).value)
+
+You can determine the size of the sheet with the Worksheet object’s `get_highest_row()` and `get_highest_column()` methods.
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> sheet = wb.get_sheet_by_name('Sheet1')
+	>>> sheet.get_highest_row()
+	7
+	>>> sheet.get_highest_column()
+	3
+
+**Converting Between Column Letters and Numbers**
+
+	>>> import openpyxl
+	>>> from openpyxl.cell import get_column_letter, column_index_from_string
+	>>> get_column_letter(1)
+	'A'
+	>>> get_column_letter(2)
+	'B'
+	>>> get_column_letter(27)
+	'AA'
+	>>> get_column_letter(900)
+	'AHP'
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> sheet = wb.get_sheet_by_name('Sheet1')
+	>>> get_column_letter(sheet.get_highest_column())
+	'C'
+	>>> column_index_from_string('A')
+	1
+	>>> column_index_from_string('AA')
+	27
+
+**Getting Rows and Columns from the Sheets**
+
+You can slice Worksheet objects to get all the Cell objects in a row, column, or rectangular area of the spreadsheet. Then you can loop over all the cells in the slice.
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> sheet = wb.get_sheet_by_name('Sheet1')
+	>>> tuple(sheet['A1':'C3'])
+	((<Cell Sheet1.A1>, <Cell Sheet1.B1>, <Cell Sheet1.C1>), (<Cell Sheet1.A2>,
+	<Cell Sheet1.B2>, <Cell Sheet1.C2>), (<Cell Sheet1.A3>, <Cell Sheet1.B3>,
+	<Cell Sheet1.C3>))
+	>>> for rowOfCellObjects in sheet['A1':'C3']:
+			for cellObj in rowOfCellObjects:
+				print(cellObj.coordinate, cellObj.value)
+			print('--- END OF ROW ---')
+	A1 2015-04-05 13:34:02
+	B1 Apples
+	C1 73
+	--- END OF ROW ---
+	A2 2015-04-05 03:41:23
+	B2 Cherries
+	C2 85
+	--- END OF ROW ---
+	A3 2015-04-06 12:46:51
+	B3 Pears
+	C3 14
+	--- END OF ROW ---
+
+To access the values of cells in a particular row or column, you can also use a Worksheet object’s rows and columns attribute.
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet.columns[1]
+	(<Cell Sheet1.B1>, <Cell Sheet1.B2>, <Cell Sheet1.B3>, <Cell Sheet1.B4>,
+	<Cell Sheet1.B5>, <Cell Sheet1.B6>, <Cell Sheet1.B7>)
+	>>> for cellObj in sheet.columns[1]:
+		print(cellObj.value)
+	Apples
+	Cherries
+	Pears
+	Oranges
+	Apples
+	Bananas
+	Strawberries
+
+### Writing Excel Documents
+
+**Creating and Saving Excel Documents**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.Workbook()
+	>>> wb.get_sheet_names()
+	['Sheet']
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet.title
+	'Sheet'
+	>>> sheet.title = 'Spam Bacon Eggs Sheet'
+	>>> wb.get_sheet_names()
+	['Spam Bacon Eggs Sheet']
+
+Any time you modify the `Workbook` object or its sheets and cells, the spreadsheet file will not be saved until you call the `save()` workbook method.
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('example.xlsx')
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet.title = 'Spam Spam Spam'
+	>>> wb.save('example_copy.xlsx')
+
+**Creating and Removing Sheets**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.Workbook()
+	>>> wb.get_sheet_names()
+	['Sheet']
+	>>> wb.create_sheet()
+	<Worksheet "Sheet1">
+	>>> wb.get_sheet_names()
+	['Sheet', 'Sheet1']
+	>>> wb.create_sheet(index=0, title='First Sheet')
+	<Worksheet "First Sheet">
+	>>> wb.get_sheet_names()
+	['First Sheet', 'Sheet', 'Sheet1']
+	>>> wb.create_sheet(index=2, title='Middle Sheet')
+	<Worksheet "Middle Sheet">
+	>>> wb.get_sheet_names()
+	['First Sheet', 'Sheet', 'Middle Sheet', 'Sheet1']
+	>>> wb.remove_sheet(wb.get_sheet_by_name('Middle Sheet'))
+	>>> wb.remove_sheet(wb.get_sheet_by_name('Sheet1'))
+	>>> wb.get_sheet_names()
+	['First Sheet', 'Sheet']
+
+**Writing Values to Cells**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.Workbook()
+	>>> sheet = wb.get_sheet_by_name('Sheet')
+	>>> sheet['A1'] = 'Hello world!'
+	>>> sheet['A1'].value
+	'Hello world!'
+
+### Setting the Font Style of Cells
+
+To customize font styles in cells, important, import the `Font()` and `Style()` functions from the `openpyxl.styles` module:
+
+	from openpyxl.styles import Font, Style
+
+This allows you to type `Font()` instead of `openpyxl.styles.Font()`.
+
+	>>> import openpyxl
+	>>> from openpyxl.styles import Font, Style
+	>>> wb = openpyxl.Workbook()
+	>>> sheet = wb.get_sheet_by_name('Sheet')
+	>>> italic24Font = Font(size=24, italic=True)
+	>>> styleObj = Style(font=italic24Font)
+	>>> sheet['A1'].style = styleObj
+	>>> sheet['A1'] = 'Hello world!'
+	>>> wb.save('styled.xlsx')
+
+### Font Objects
+
+Keyword arguments for font style attributes
+
+Keyword argument | Data type | Description
+--- | --- | ---
+name | `String` | The font name, such as 'Calibri' or 'Times New Roman'
+size | `Integer` | The point size
+bold | `Boolean` | `True`, for bold font
+italic | `Boolean` | `True`, for italic font
+
+You can call `Font()` to create a `Font` object and store that `Font` object in a variable. You then pass that to `Style()`, store the resulting `Style` object in a variable, and assign that variable to a `Cell` object's style attribute.
+
+	>>> import openpyxl
+	>>> from openpyxl.styles import Font, Style
+	>>> wb = openpyxl.Workbook()
+	>>> sheet = wb.get_sheet_by_name('Sheet')
+	>>> fontObj1 = Font(name='Times New Roman', bold=True)
+	>>> styleObj1 = Style(font=fontObj1)
+	>>> sheet['A1'].style = styleObj1
+	>>> sheet['A1'] = 'Bold Times New Roman'
+	>>> fontObj2 = Font(size=24, italic=True)
+	>>> styleObj2 = Style(font=fontObj2)
+	>>> sheet['B3'].style = styleObj2
+	>>> sheet['B3'] = '24 pt Italic'
+	>>> wb.save('styles.xlsx')
+
+### Formulas
+
+A formula is set just like any other text value in a cell.
+
+	>>> import openpyxl
+	>>> wb = openpyxl.Workbook()
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet['A1'] = 200
+	>>> sheet['A2'] = 300
+	>>> sheet['A3'] = '=SUM(A1:A2)'
+	>>> wb.save('writeFormula.xlsx')
+
+### Adjusting Rows and Columns
+
+**Setting Row Height and Column Width**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.Workbook()
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet['A1'] = 'Tall row'
+	>>> sheet['B2'] = 'Wide column'
+	>>> sheet.row_dimensions[1].height = 70
+	>>> sheet.column_dimensions['B'].width = 20
+	>>> wb.save('dimensions.xlsx')
+
+**Merging and Unmerging Cells**
+
+	>>> import openpyxl
+	>>> wb = openpyxl.Workbook()
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet.merge_cells('A1:D3')
+	>>> sheet['A1'] = 'Twelve cells merged together.'
+	>>> sheet.merge_cells('C5:D5')
+	>>> sheet['C5'] = 'Two merged cells.'
+	>>> wb.save('merged.xlsx')
+
+The argument to `merge_cells()` is a single string of the top-left and bottom-right cells of the rectangular area to be merged: 'A1:D3' merges 12 cells into a single cell. To set the value of these merged cells, simply set the value of the top-left cell of the merged group.
+
+To unmerge cells, call the `unmerge_cells()`:
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('merged.xlsx')
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet.unmerge_cells('A1:D3')
+	>>> sheet.unmerge_cells('C5:D5')
+	>>> wb.save('merged.xlsx')
+
+**Freeze Panes**
+
+Frozen Pane Settings:
+
+`freeze_panes` setting | Rows and columns frozen
+--- | ---
+`sheet.freeze_panes = 'A2'` | Row 1
+`sheet.freeze_panes = 'B1'` | Column A
+`sheet.freeze_panes = 'C1'` | Columns A and B
+`sheet.freeze_panes = 'C2'` | Row 1 and columns A and B
+`sheet.freeze_panes = 'A1'` or `sheet.freeze_panes = None` | No frozen panes
+
+Example:
+
+	>>> import openpyxl
+	>>> wb = openpyxl.load_workbook('produceSales.xlsx')
+	>>> sheet = wb.get_active_sheet()
+	>>> sheet.freeze_panes = 'A2'
+	>>> wb.save('freezeExample.xlsx')
+
+### Charts
+
+OpenPyXL supports creating bar, line, scatter, and pie charts using the data in a sheet’s cells. If you want to see what additional features may be available to you, you can check out the full documentation for OpenPyXL at [http://openpyxl.readthedocs.org/](http://openpyxl.readthedocs.org/).
+
 ## Working with PDF and Word Documents <a name="ch13">&nbsp;</a>
 
 ## Working with CSV Files and JSON Data <a name="ch14">&nbsp;</a>
