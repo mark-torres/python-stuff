@@ -742,7 +742,7 @@ You can place an `r` before the beginning quotation mark of a string to make it 
 
 ### Multiline Strings with Triple Quotes
 
-A multiline string in Python begins and ends with either three single quotes or three double quotes. Any quotes, tabs, or newlines in between the "triple quotes" are considered part of the string. Python’s indentation rules for blocks do not apply to lines inside a multiline string.
+A multiline string in Python begins and ends with either three single quotes or three double quotes. Any quotes, tabs, or newlines in between the "triple quotes" are considered part of the string. Python's indentation rules for blocks do not apply to lines inside a multiline string.
 
 ### Multiline Comments
 
@@ -909,7 +909,7 @@ The isX string methods are helpful when you need to validate user input.
 
 ### Copying and Pasting Strings with the pyperclip Module
 
-The pyperclip module has copy() and paste() functions that can send text to and receive text from your computer’s clipboard.
+The pyperclip module has copy() and paste() functions that can send text to and receive text from your computer's clipboard.
 
 	>>> import pyperclip
 	>>> pyperclip.copy('Hello world!')
@@ -935,7 +935,7 @@ Since regular expressions frequently use backslashes in them, it is convenient t
 
 ### Matching Regex Objects
 
-A Regex object’s `search()` method searches the string it is passed for any matches to the regex. The `search()` method will return `None` if the regex pattern is not found in the string. If the pattern is found, the `search()` method returns a `Match` object. Match objects have a `group()` method that will return the actual matched text from the searched string.
+A Regex object's `search()` method searches the string it is passed for any matches to the regex. The `search()` method will return `None` if the regex pattern is not found in the string. If the pattern is found, the `search()` method returns a `Match` object. Match objects have a `group()` method that will return the actual matched text from the searched string.
 
 	>>> phoneNumRegex = re.compile(r'\d\d\d-\d\d\d-\d\d\d\d')
 	>>> mo = phoneNumRegex.search('My number is 415-555-4242.')
@@ -964,7 +964,7 @@ A Regex object’s `search()` method searches the string it is passed for any ma
 
 ### Greedy and Nongreedy Matching
 
-Python’s regular expressions are greedy by default, which means that in ambiguous situations they will match the longest string possible. The non-greedy version of the curly brackets, which matches the shortest string possible, has the closing curly bracket followed by a question mark.
+Python's regular expressions are greedy by default, which means that in ambiguous situations they will match the longest string possible. The non-greedy version of the curly brackets, which matches the shortest string possible, has the closing curly bracket followed by a question mark.
 
 	>>> greedyHaRegex = re.compile(r'(Ha){3,5}')
 	>>> mo1 = greedyHaRegex.search('HaHaHaHaHa')
@@ -1009,7 +1009,7 @@ The dot-star will match everything except a newline. By passing `re.DOTALL` as t
 
 ### Case-Insensitive Matching
 
-Normally, regular expressions match text with the exact casing you specify. But sometimes you care only about matching the letters without worrying whether they’re uppercase or lowercase. To make your regex case-insensitive, you can pass `re.IGNORECASE` or `re.I` as a second argument to `re.compile()`.
+Normally, regular expressions match text with the exact casing you specify. But sometimes you care only about matching the letters without worrying whether they're uppercase or lowercase. To make your regex case-insensitive, you can pass `re.IGNORECASE` or `re.I` as a second argument to `re.compile()`.
 
 	>>> robocop = re.compile(r'robocop', re.I)
 	>>> robocop.search('Robocop is part man, part machine, all cop.').group()
@@ -1049,7 +1049,7 @@ Regular expressions are fine if the text pattern you need to match is simple. Bu
 
 ### Combining re.IGNORECASE, re.DOTALL, and re.VERBOSE
 
-If you want a regular expression that’s case-insensitive and includes newlines to match the dot character, you would form your `re.compile()` call like this:
+If you want a regular expression that's case-insensitive and includes newlines to match the dot character, you would form your `re.compile()` call like this:
 
 	>>> someRegexValue = re.compile('foo', re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
@@ -1243,7 +1243,7 @@ The folders that make up the destination must already exist, or else Python will
 
 **Permanently Deleting Files and Folders**
 
-Be careful when using these functions in your programs! It’s often a good idea to first run your program with these calls commented out and with print() calls added to show the files that would be deleted.
+Be careful when using these functions in your programs! It's often a good idea to first run your program with these calls commented out and with print() calls added to show the files that would be deleted.
 
 	import os
 	for filename in os.listdir():
@@ -1253,7 +1253,7 @@ Be careful when using these functions in your programs! It’s often a good idea
 
 **Safe Deletes with the send2trash Module**
 
-Since Python’s built-in `shutil.rmtree()` function irreversibly deletes files and folders, it can be dangerous to use. A much better way to delete files and folders is with the third-party `send2trash` module. You can install this module by running `pip install send2trash` from a Terminal window.
+Since Python's built-in `shutil.rmtree()` function irreversibly deletes files and folders, it can be dangerous to use. A much better way to delete files and folders is with the third-party `send2trash` module. You can install this module by running `pip install send2trash` from a Terminal window.
 
 	>>> import send2trash
 	>>> baconFile = open('bacon.txt', 'a') # creates the file
@@ -1340,7 +1340,7 @@ Example:
 
 ### Assertions
 
-An assertion is a sanity check to make sure your code isn’t doing something obviously wrong. These sanity checks are performed by assert statements. If the sanity check fails, then an AssertionError exception is raised. In code, an assert statement consists of the following:
+An assertion is a sanity check to make sure your code isn't doing something obviously wrong. These sanity checks are performed by assert statements. If the sanity check fails, then an AssertionError exception is raised. In code, an assert statement consists of the following:
 
 * The `assert` keyword
 * A condition (that is, an expression that evaluates to `True` or `False`)
@@ -1375,7 +1375,7 @@ Level | Logging Function | Description
 --- | --- | ---
 `DEBUG` | `logging.debug()` | The lowest level. Used for small details. Usually you care about these messages only when diagnosing problems.
 `INFO` | `logging.info()` | Used to record information on general events in your program or confirm that things are working at their point in the program.
-`WARNING` | `logging.warning()` | Used to indicate a potential problem that doesn’t prevent the program from working but might do so in the future.
+`WARNING` | `logging.warning()` | Used to indicate a potential problem that doesn't prevent the program from working but might do so in the future.
 `ERROR` | `logging.error()` | Used to record an error that caused the program to fail to do something.
 `CRITICAL` | `logging.critical()` | The highest level. Used to indicate a fatal error that has caused or is about to cause the program to stop running entirely.
 
@@ -1394,7 +1394,7 @@ Level | Logging Function | Description
 
 **Disabling Logging**
 
-After you’ve debugged your program, you probably don’t want all these log messages cluttering the screen. The `logging.disable()` function disables these so that you don’t have to go into your program and remove all the logging calls by hand. You simply pass `logging.disable()` a logging level, and it will suppress all log messages at that level or lower. So if you want to disable logging entirely, just add `logging.disable(logging.CRITICAL)` to your program.
+After you've debugged your program, you probably don't want all these log messages cluttering the screen. The `logging.disable()` function disables these so that you don't have to go into your program and remove all the logging calls by hand. You simply pass `logging.disable()` a logging level, and it will suppress all log messages at that level or lower. So if you want to disable logging entirely, just add `logging.disable(logging.CRITICAL)` to your program.
 
 Since `logging.disable()` will disable all messages after it, you will probably want to add it near the `import logging` line of code in your program. This way, you can easily find it to comment out or uncomment that call to enable or disable logging messages as needed.
 
@@ -1418,7 +1418,7 @@ Modules to use:
 
 **The `webbrowser` module**
 
-The webbrowser module’s open() function can launch a new browser to a specified URL:
+The webbrowser module's open() function can launch a new browser to a specified URL:
 
 	>>> import webbrowser
 	>>> webbrowser.open('http://inventwithpython.com/')
@@ -1442,7 +1442,7 @@ This is about the only thing the webbrowser module can do.
 
 **Checking for Errors**
 
-As you’ve seen, the Response object has a `status_code` attribute that can be checked against `requests.codes.ok` to see whether the download succeeded. A simpler way to check for success is to call the `raise_for_status()` method on the Response object. This will raise an exception if there was an error downloading the file and will do nothing if the download succeeded.
+As you've seen, the Response object has a `status_code` attribute that can be checked against `requests.codes.ok` to see whether the download succeeded. A simpler way to check for success is to call the `raise_for_status()` method on the Response object. This will raise an exception if there was an error downloading the file and will do nothing if the download succeeded.
 
 	>>> res = requests.get('http://inventwithpython.com/page_that_does_not_exist')
 	>>> res.raise_for_status()
@@ -1453,7 +1453,7 @@ As you’ve seen, the Response object has a `status_code` attribute that can be 
 			raise HTTPError(http_error_msg, response=self)
 	requests.exceptions.HTTPError: 404 Client Error: Not Found
 
-The `raise_for_status()` method is a good way to ensure that a program halts if a bad download occurs. If a failed download isn’t a deal breaker for your program, you can wrap the `raise_for_status()` line with `try` and `except` statements to handle this error case without crashing.
+The `raise_for_status()` method is a good way to ensure that a program halts if a bad download occurs. If a failed download isn't a deal breaker for your program, you can wrap the `raise_for_status()` line with `try` and `except` statements to handle this error case without crashing.
 
 	import requests
 	res = requests.get('http://inventwithpython.com/page_that_does_not_exist')
@@ -1466,7 +1466,7 @@ The `raise_for_status()` method is a good way to ensure that a program halts if 
 
 You can save the web page to a file on your hard drive with the standard `open()` function and `write()` method but you must open the file in write binary mode by passing the string 'wb' as the second argument to `open()`. Even if the page is in plaintext you need to write binary data instead of text data in order to maintain the Unicode encoding of the text.
 
-To write the web page to a file, you can use a for loop with the `Response` object’s `iter_content()` method.
+To write the web page to a file, you can use a for loop with the `Response` object's `iter_content()` method.
 
 	>>> import requests
 	>>> res = requests.get('https://automatetheboringstuff.com/files/rj.txt')
@@ -1533,7 +1533,7 @@ Selector passed to the select() method | Will match...
 	>>> elems[0].attrs
 	{'id': 'author'}
 
-**Getting Data from an Element’s Attributes**
+**Getting Data from an Element's Attributes**
 
 	>>> import bs4
 	>>> soup = bs4.BeautifulSoup(open('example.html'))
@@ -1553,7 +1553,7 @@ The selenium module lets Python directly control the browser by programmatically
 
 **Starting a Selenium-Controlled Browser**
 
-For these examples, you’ll need the Firefox web browser.
+For these examples, you'll need the Firefox web browser.
 
 	>>> from selenium import webdriver
 	>>> browser = webdriver.Firefox()
@@ -1565,7 +1565,7 @@ For these examples, you’ll need the Firefox web browser.
 
 WebDriver objects have quite a few methods for finding elements on a page. They are divided into the `find_element_*` and `find_elements_*` methods. The `find_element_*` methods return a single WebElement object, representing the first element on the page that matches your query. The `find_elements_*` methods return a list of `WebElement_*` objects for every matching element on the page.
 
-Selenium’s WebDriver Methods for Finding Elements:
+Selenium's WebDriver Methods for Finding Elements:
 
 Method name | WebElement object/list returned
 --- | ---
@@ -1584,7 +1584,7 @@ WebElement Attributes and Methods
 Attribute or method | Description
 --- | ---
 `tag_name` | The tag name, such as 'a' for an `<a>` element
-`get_attribute(name)` | The value for the element’s name attribute
+`get_attribute(name)` | The value for the element's name attribute
 `text` | The text within the element, such as 'hello' in `<span>hello</span>`
 `clear()` | For text field or text area elements, clears the text typed into it
 `is_displayed()` | Returns `True` if the element is visible; otherwise returns `False`
@@ -1704,7 +1704,7 @@ The `openpyxl` module allows your Python programs to read and modify Excel sprea
 	>>> sheet['C1'].value
 	73
 
-Specifying a column by letter can be tricky to program, especially because after column Z, the columns start by using two letters: AA, AB, AC, and so on. As an alternative, you can also get a cell using the sheet’s `cell()` method and passing integers for its row and column keyword arguments. The first row or column integer is 1, not 0.
+Specifying a column by letter can be tricky to program, especially because after column Z, the columns start by using two letters: AA, AB, AC, and so on. As an alternative, you can also get a cell using the sheet's `cell()` method and passing integers for its row and column keyword arguments. The first row or column integer is 1, not 0.
 
 	>>> sheet.cell(row=1, column=2)
 	<Cell Sheet1.B1>
@@ -1713,7 +1713,7 @@ Specifying a column by letter can be tricky to program, especially because after
 	>>> for i in range(1, 8, 2):
 		print(i, sheet.cell(row=i, column=2).value)
 
-You can determine the size of the sheet with the Worksheet object’s `get_highest_row()` and `get_highest_column()` methods.
+You can determine the size of the sheet with the Worksheet object's `get_highest_row()` and `get_highest_column()` methods.
 
 	>>> import openpyxl
 	>>> wb = openpyxl.load_workbook('example.xlsx')
@@ -1772,7 +1772,7 @@ You can slice Worksheet objects to get all the Cell objects in a row, column, or
 	C3 14
 	--- END OF ROW ---
 
-To access the values of cells in a particular row or column, you can also use a Worksheet object’s rows and columns attribute.
+To access the values of cells in a particular row or column, you can also use a Worksheet object's rows and columns attribute.
 
 	>>> import openpyxl
 	>>> wb = openpyxl.load_workbook('example.xlsx')
@@ -1959,9 +1959,177 @@ Example:
 
 ### Charts
 
-OpenPyXL supports creating bar, line, scatter, and pie charts using the data in a sheet’s cells. If you want to see what additional features may be available to you, you can check out the full documentation for OpenPyXL at [http://openpyxl.readthedocs.org/](http://openpyxl.readthedocs.org/).
+OpenPyXL supports creating bar, line, scatter, and pie charts using the data in a sheet's cells. If you want to see what additional features may be available to you, you can check out the full documentation for OpenPyXL at [http://openpyxl.readthedocs.org/](http://openpyxl.readthedocs.org/).
 
 ## Working with PDF and Word Documents <a name="ch13">&nbsp;</a>
+
+There are Python modules that make it easy for you to interact with PDFs and Word documents. This chapter will cover two such modules: PyPDF2 and Python-Docx.
+
+### PDF Documents
+
+**Extracting Text from PDFs**
+
+PyPDF2 does not have a way to extract images, charts, or other media from PDF documents, but it can extract text and return it as a Python string.
+
+**Creating PDFs**
+
+PyPDF2 doesn't allow you to directly edit a PDF. Instead, you have to create a new PDF and then copy content over from an existing document.
+
+### Word Documents
+
+Python can create and modify Word documents, which have the .docx file extension, with the python-docx module. You can install the module by running pip install python-docx.
+
+**Reading Word Documents**
+
+	>>> import docx
+	>>> doc = docx.Document('demo.docx')
+	>>> len(doc.paragraphs)
+	7
+	>>> doc.paragraphs[0].text
+	'Document Title'
+	>>> doc.paragraphs[1].text
+	'A plain paragraph with some bold and some italic'
+	>>> len(doc.paragraphs[1].runs)
+	4
+	>>> doc.paragraphs[1].runs[0].text
+	'A plain paragraph with some '
+	>>> doc.paragraphs[1].runs[1].text
+	'bold'
+	>>> doc.paragraphs[1].runs[2].text
+	' and some '
+	>>> doc.paragraphs[1].runs[3].text
+	'italic'
+
+**Getting the Full Text from a .docx File**
+
+	>>> import readDocx
+	>>> print(readDocx.getText('demo.docx'))
+	Document Title
+	A plain paragraph with some bold and some italic
+	Heading, level 1
+	Intense quote
+	first item in unordered list
+	first item in ordered list
+
+**Styling Paragraph and Run Objects**
+
+For Word documents, there are three types of styles: *Paragraph styles* can be applied to `Paragraph` objects, *character styles* can be applied to `Run` objects, and *linked styles* can be applied to both kinds of objects. You can give both `Paragraph` and `Run` objects styles by setting their style attribute to a string. This string should be the name of a style. If style is set to `None`, then there will be no style associated with the `Paragraph` or `Run` object.
+
+The string values for the default Word styles are as follows:
+
+&nbsp; | &nbsp; | &nbsp; | &nbsp;
+--- | --- | --- | ---
+'Normal' | 'Heading5' | 'ListBullet' | 'ListParagraph'
+'BodyText' | 'Heading6' | 'ListBullet2' | 'MacroText'
+'BodyText2' | 'Heading7' | 'ListBullet3' | 'NoSpacing'
+'BodyText3' | 'Heading8' | 'ListContinue' | 'Quote'
+'Caption' | 'Heading9' | 'ListContinue2' | 'Subtitle'
+'Heading1' | 'IntenseQuote' | 'ListContinue3' | 'TOCHeading'
+'Heading2' | 'List' | 'ListNumber' | 'Title'
+'Heading3' | 'List2' | 'ListNumber2' | &nbsp;
+'Heading4' | 'List3' | 'ListNumber3' | &nbsp;
+
+When using a *linked style* for a `Run` object, you will need to add 'Char' to the end of its name. For example, to set the `Quote` linked style for a `Paragraph` object, you would use `paragraphObj.style = 'Quote'`, but for a `Run` object, you would use `runObj.style = 'QuoteChar'`.
+
+**Run Attributes**
+
+`Runs` can be further styled using text attributes. Each attribute can be set to one of three values: `True` (the attribute is always enabled, no matter what other styles are applied to the run), `False` (the attribute is always disabled), or `None` (defaults to whatever the run's style is set to).
+
+Run Object text Attributes
+
+Attribute | Description
+--- | ---
+`bold` | The text appears in bold.
+`italic` | The text appears in italic.
+`underline` | The text is underlined.
+`strike` | The text appears with strikethrough.
+`double_strike` | The text appears with double strikethrough.
+`all_caps` | The text appears in capital letters.
+`small_caps` | The text appears in capital letters, with lowercase letters two points smaller.
+`shadow` | The text appears with a shadow.
+`outline` | The text appears outlined rather than solid.
+`rtl` | The text is written right-to-left.
+`imprint` | The text appears pressed into the page.
+`emboss` | The text appears raised off the page in relief.
+
+Example
+
+	>>> doc = docx.Document('demo.docx')
+	>>> doc.paragraphs[0].text
+	'Document Title'
+	>>> doc.paragraphs[0].style
+	'Title'
+	>>> doc.paragraphs[0].style = 'Normal'
+	>>> doc.paragraphs[1].text
+	'A plain paragraph with some bold and some italic'
+	>>> (doc.paragraphs[1].runs[0].text, doc.paragraphs[1].runs[1].text, doc.
+	paragraphs[1].runs[2].text, doc.paragraphs[1].runs[3].text)
+	('A plain paragraph with some ', 'bold', ' and some ', 'italic')
+	>>> doc.paragraphs[1].runs[0].style = 'QuoteChar'
+	>>> doc.paragraphs[1].runs[1].underline = True
+	>>> doc.paragraphs[1].runs[3].underline = True
+	>>> doc.save('restyled.docx')
+
+**Writing Word Documents**
+
+	>>> import docx
+	>>> doc = docx.Document()
+	>>> doc.add_paragraph('Hello world!')
+	<docx.text.Paragraph object at 0x0000000003B56F60>
+	>>> doc.save('helloworld.docx')
+
+You can add paragraphs by calling the `add_paragraph()` method again with the new paragraph’s text. Or to add text to the end of an existing paragraph, you can call the paragraph’s `add_run()` method and pass it a string.
+
+	>>> import docx
+	>>> doc = docx.Document()
+	>>> doc.add_paragraph('Hello world!')
+	<docx.text.Paragraph object at 0x000000000366AD30>
+	>>> paraObj1 = doc.add_paragraph('This is a second paragraph.')
+	>>> paraObj2 = doc.add_paragraph('This is a yet another paragraph.')
+	>>> paraObj1.add_run(' This text is being added to the second paragraph.')
+	<docx.text.Run object at 0x0000000003A2C860>
+	>>> doc.save('multipleParagraphs.docx')
+
+Both `add_paragraph()` and `add_run()` accept an optional second argument that is a string of the `Paragraph` or `Run` object’s style. For example:
+
+	>>> doc.add_paragraph('Hello world!', 'Title')
+
+This line adds a paragraph with the text *Hello world!* in the `Title` style.
+
+**Adding Headings**
+
+	>>> doc = docx.Document()
+	>>> doc.add_heading('Header 0', 0)
+	<docx.text.Paragraph object at 0x00000000036CB3C8>
+	>>> doc.add_heading('Header 1', 1)
+	<docx.text.Paragraph object at 0x00000000036CB630>
+	>>> doc.add_heading('Header 2', 2)
+	<docx.text.Paragraph object at 0x00000000036CB828>
+	>>> doc.add_heading('Header 3', 3)
+	<docx.text.Paragraph object at 0x00000000036CB2E8>
+	>>> doc.add_heading('Header 4', 4)
+	<docx.text.Paragraph object at 0x00000000036CB3C8>
+	>>> doc.save('headings.docx')
+
+The arguments to `add_heading()` are a string of the heading text and an integer from 0 to 4. The integer 0 makes the heading the `Title` style, which is used for the top of the document. Integers 1 to 4 are for various heading levels, with 1 being the main heading and 4 the lowest subheading. The `add_heading()` function returns a `Paragraph` object to save you the step of extracting it from the `Document` object as a separate step.
+
+**Adding Line and Page Breaks**
+
+	>>> doc = docx.Document()
+	>>> doc.add_paragraph('This is on the first page!')
+	<docx.text.Paragraph object at 0x0000000003785518>
+	>>> doc.paragraphs[0].runs[0].add_break(docx.text.WD_BREAK.PAGE)
+	>>> doc.add_paragraph('This is on the second page!')
+	<docx.text.Paragraph object at 0x00000000037855F8>
+	>>> doc.save('twoPage.docx')
+
+**Adding Pictures**
+
+Document objects have an `add_picture()` method that will let you add an image to the end of the document. Say you have a file zophie.png in the current working directory. You can add *zophie.png* to the end of your document with a width of 1 inch and height of 4 centimeters (Word can use both imperial and metric units) by entering the following:
+
+	>>> doc.add_picture('zophie.png', width=docx.shared.Inches(1),
+	height=docx.shared.Cm(4))
+	<docx.shape.InlineShape object at 0x00000000036C7D30>
 
 ## Working with CSV Files and JSON Data <a name="ch14">&nbsp;</a>
 
