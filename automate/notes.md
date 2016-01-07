@@ -2133,6 +2133,85 @@ Document objects have an `add_picture()` method that will let you add an image t
 
 ## Working with CSV Files and JSON Data <a name="ch14">&nbsp;</a>
 
+Python also comes with the special `csv` and `json` modules, each providing functions to help you work with these file formats.
+
+### The CSV Module
+
+**Reader Objects**
+
+	>>> import csv
+	>>> exampleFile = open('example.csv')
+	>>> exampleReader = csv.reader(exampleFile)
+	>>> exampleData = list(exampleReader)
+	>>> exampleData
+	[['4/5/2015 13:34', 'Apples', '73'], ['4/5/2015 3:41', 'Cherries', '85'],
+	['4/6/2015 12:46', 'Pears', '14'], ['4/8/2015 8:59', 'Oranges', '52'],
+	['4/10/2015 2:07', 'Apples', '152'], ['4/10/2015 18:10', 'Bananas', '23'],
+	['4/10/2015 2:40', 'Strawberries', '98']]
+
+**Reading Data from Reader Objects in a for Loop**
+
+	>>> import csv
+	>>> exampleFile = open('example.csv')
+	>>> exampleReader = csv.reader(exampleFile)
+	>>> for row in exampleReader:
+			print('Row #' + str(exampleReader.line_num) + ' ' + str(row))
+	Row #1 ['4/5/2015 13:34', 'Apples', '73']
+	Row #2 ['4/5/2015 3:41', 'Cherries', '85']
+	Row #3 ['4/6/2015 12:46', 'Pears', '14']
+	Row #4 ['4/8/2015 8:59', 'Oranges', '52']
+	Row #5 ['4/10/2015 2:07', 'Apples', '152']
+	Row #6 ['4/10/2015 18:10', 'Bananas', '23']
+	Row #7 ['4/10/2015 2:40', 'Strawberries', '98']
+
+**Writer Objects**
+
+	>>> import csv
+	>>> outputFile = open('output.csv', 'w', newline='')
+	>>> outputWriter = csv.writer(outputFile)
+	>>> outputWriter.writerow(['spam', 'eggs', 'bacon', 'ham'])
+	21
+	>>> outputWriter.writerow(['Hello, world!', 'eggs', 'bacon', 'ham'])
+	32
+	>>> outputWriter.writerow([1, 2, 3.141592, 4])
+	16
+	>>> outputFile.close()
+
+On Windows, you’ll also need to pass a blank string for the `open()` function’s `newline` keyword argument. For technical reasons beyond the scope of this book, if you forget to set the newline argument, the rows in output.csv will be double-spaced.
+
+**The delimiter and lineterminator Keyword Arguments**
+
+	>>> import csv
+	>>> csvFile = open('example.tsv', 'w', newline='')
+	>>> csvWriter = csv.writer(csvFile, delimiter='\t', lineterminator='\n\n')
+	>>> csvWriter.writerow(['apples', 'oranges', 'grapes'])
+	24
+	>>> csvWriter.writerow(['eggs', 'bacon', 'ham'])
+	17
+	>>> csvWriter.writerow(['spam', 'spam', 'spam', 'spam', 'spam', 'spam'])
+	32
+	>>> csvFile.close()
+
+### The JSON Module
+
+**Reading JSON with the loads() Function**
+
+	>>> stringOfJsonData = '{"name": "Zophie", "isCat": true, "miceCaught": 0,
+	"felineIQ": null}'
+	>>> import json
+	>>> jsonDataAsPythonValue = json.loads(stringOfJsonData)
+	>>> jsonDataAsPythonValue
+	{'isCat': True, 'miceCaught': 0, 'name': 'Zophie', 'felineIQ': None}
+
+**Writing JSON with the dumps() Function**
+
+	>>> pythonValue = {'isCat': True, 'miceCaught': 0, 'name': 'Zophie',
+	'felineIQ': None}
+	>>> import json
+	>>> stringOfJsonData = json.dumps(pythonValue)
+	>>> stringOfJsonData
+	'{"isCat": true, "felineIQ": null, "miceCaught": 0, "name": "Zophie" }'
+
 ## Time, Scheduling Tasks, and Launching Programs <a name="ch15">&nbsp;</a>
 
 ## Sending Email and Text Messages <a name="ch16">&nbsp;</a>
