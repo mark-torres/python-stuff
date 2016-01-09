@@ -2214,6 +2214,238 @@ On Windows, you’ll also need to pass a blank string for the `open()` function�
 
 ## Time, Scheduling Tasks, and Launching Programs <a name="ch15">&nbsp;</a>
 
+### The time module
+
+**The time.time() Function**
+
+The `time.time()` function returns the number of seconds since 12 AM on January 1, 1970, Coordinated Universal Time (UTC) as a float value.
+
+	>>> import time
+	>>> time.time()
+	1425063955.068649
+
+**The time.sleep() Function**
+
+If you need to pause your program for a while, call the `time.sleep()` function and pass it the number of seconds you want your program to stay paused.
+
+	>>> import time
+	>>> for i in range(3):
+			print('Tick')
+			time.sleep(1)
+			print('Tock')
+			time.sleep(1)
+	Tick
+	Tock
+	Tick
+	Tock
+	Tick
+	Tock
+	>>> time.sleep(5)
+
+**Rounding Numbers**
+
+	>>> import time
+	>>> now = time.time()
+	>>> now
+	1425064108.017826
+	>>> round(now, 2)
+	1425064108.02
+	>>> round(now, 4)
+	1425064108.0178
+	>>> round(now)
+	1425064108
+
+### The datetime Module
+
+The `time` module is useful for getting a Unix epoch timestamp to work with. But if you want to display a date in a more convenient format, or do arithmetic with dates, you should use the `datetime` module.
+
+	>>> import datetime
+	>>> datetime.datetime.now()
+	datetime.datetime(2015, 2, 27, 11, 10, 49, 55, 53)
+	>>> dt = datetime.datetime(2015, 10, 21, 16, 29, 0)
+	>>> dt.year, dt.month, dt.day
+	(2015, 10, 21)
+	>>> dt.hour, dt.minute, dt.second
+	(16, 29, 0)
+
+A Unix epoch timestamp can be converted to a datetime object with the `datetime.datetime.fromtimestamp()` function. The date and time of the `datetime` object will be converted for the local time zone.
+
+	>>> datetime.datetime.fromtimestamp(1000000)
+	datetime.datetime(1970, 1, 12, 5, 46, 40)
+	>>> datetime.datetime.fromtimestamp(time.time())
+	datetime.datetime(2015, 2, 27, 11, 13, 0, 604980)
+
+`datetime` objects can be compared with each other using comparison operators to find out which one precedes the other. The later `datetime` object is the "greater" value.
+
+	>>> halloween2015 = datetime.datetime(2015, 10, 31, 0, 0, 0)
+	>>> newyears2016 = datetime.datetime(2016, 1, 1, 0, 0, 0)
+	>>> oct31_2015 = datetime.datetime(2015, 10, 31, 0, 0, 0)
+	>>> halloween2015 == oct31_2015
+	True
+	>>> halloween2015 > newyears2016
+	False
+	>>> newyears2016 > halloween2015
+	True
+	>>> newyears2016 != oct31_2015
+	True
+
+**The timedelta Data Type**
+
+The datetime module also provides a timedelta data type, which represents a duration of time rather than a moment in time.
+
+	>>> delta = datetime.timedelta(days=11, hours=10, minutes=9, seconds=8)
+	>>> delta.days, delta.seconds, delta.microseconds
+	(11, 36548, 0)
+	>>> delta.total_seconds()
+	986948.0
+	>>> str(delta)
+	'11 days, 10:09:08'
+
+**Pausing Until a Specific Date**
+
+	import datetime
+	import time
+	halloween2016 = datetime.datetime(2016, 10, 31, 0, 0, 0)
+	while datetime.datetime.now() < halloween2016:
+		time.sleep(1)
+
+**Converting datetime Objects into Strings**
+
+The `strftime()` method uses directives similar to Python’s string formatting.
+
+`strftime` directive | Meaning
+--- | ---
+`%Y` | Year with century, as in '2014'
+`%y` | Year without century, '00' to '99' (1970 to 2069)
+`%m` | Month as a decimal number, '01' to '12'
+`%B` | Full month name, as in 'November'
+`%b` | Abbreviated month name, as in 'Nov'
+`%d` | Day of the month, '01' to '31'
+`%j` | Day of the year, '001' to '366'
+`%w` | Day of the week, '0' (Sunday) to '6' (Saturday)
+`%A` | Full weekday name, as in 'Monday'
+`%a` | Abbreviated weekday name, as in 'Mon'
+`%H` | Hour (24-hour clock), '00' to '23'
+`%I` | Hour (12-hour clock), '01' to '12'
+`%M` | Minute, '00' to '59'
+`%S` | Second, '00' to '59'
+`%p` | 'AM' or 'PM'
+`%%` | Literal '%' character
+
+Example:
+
+	>>> oct21st = datetime.datetime(2015, 10, 21, 16, 29, 0)
+	>>> oct21st.strftime('%Y/%m/%d %H:%M:%S')
+	'2015/10/21 16:29:00'
+	>>> oct21st.strftime('%I:%M %p')
+	'04:29 PM'
+	>>> oct21st.strftime("%B of '%y")
+	"October of '15"
+
+**Converting Strings into datetime Objects**
+
+If you have a string of date information, such as '2015/10/21 16:29:00' or 'October 21, 2015', and need to convert it to a `datetime` object, use the `datetime.datetime.strptime()` function. The `strptime()` function is the inverse of the `strftime()` method. A custom format string using the same directives as `strftime()` must be passed so that `strptime()` knows how to parse and understand the string. (The p in the name of the `strptime()` function stands for parse.)
+
+	>>> datetime.datetime.strptime('October 21, 2015', '%B %d, %Y')
+	datetime.datetime(2015, 10, 21, 0, 0)
+	>>> datetime.datetime.strptime('2015/10/21 16:29:00', '%Y/%m/%d %H:%M:%S')
+	datetime.datetime(2015, 10, 21, 16, 29)
+	>>> datetime.datetime.strptime("October of '15", "%B of '%y")
+	datetime.datetime(2015, 10, 1, 0, 0)
+	>>> datetime.datetime.strptime("November of '63", "%B of '%y")
+	datetime.datetime(2063, 11, 1, 0, 0)
+
+### Multithreading
+
+To make a separate thread, you first need to make a `Thread` object by calling the `threading.Thread()` function.
+
+	import threading, time
+	print('Start of program.')
+		
+	def takeANap():
+		time.sleep(5)
+		print('Wake up!')
+		
+	threadObj = threading.Thread(target=takeANap)
+	threadObj.start()
+	
+	print('End of program.')
+
+**Passing Arguments to the Thread’s Target Function**
+
+Example:
+
+	>>> print('Cats', 'Dogs', 'Frogs', sep=' & ')
+	Cats & Dogs & Frogs
+
+Pass arguments:
+
+	>>> import threading
+	>>> threadObj = threading.Thread(target=print, args=['Cats', 'Dogs', 'Frogs'],
+	kwargs={'sep': ' & '})
+	>>> threadObj.start()
+	Cats & Dogs & Frogs
+
+### Launching Other Programs from Python
+
+Your Python program can start other programs on your computer with the `Popen()` function in the built-in `subprocess` module (The P in the name of the `Popen()` function stands for process).
+
+Windows example:
+
+	>>> import subprocess
+	>>> subprocess.Popen('C:\\Windows\\System32\\calc.exe')
+	<subprocess.Popen object at 0x0000000003055A58>
+
+Ubuntu example:
+
+	>>> import subprocess
+	>>> subprocess.Popen('/usr/bin/gnome-calculator')
+	<subprocess.Popen object at 0x7f2bcf93b20>
+
+The return value is a Popen object, which has two useful methods: `poll()` and `wait()`. The `poll()` method will return None if the process is still running at the time `poll()` is called. If the program has terminated, it will return the process's integer exit code. An exit code is used to indicate whether the process terminated without errors (an exit code of 0) or whether an error caused the process to terminate (a nonzero exit code—generally 1, but it may vary depending on the program). The `wait()` method will block until the launched process has terminated. This is helpful if you want your program to pause until the user finishes with the other program. The return value of `wait()` is the process’s integer exit code.
+
+Windows example:
+
+	>>> calcProc = subprocess.Popen('c:\\Windows\\System32\\calc.exe')
+	>>> calcProc.poll() == None
+	True
+	>>> calcProc.wait()
+	0
+	>>> calcProc.poll()
+	0
+
+**Passing Command Line Arguments to Popen()**
+
+To do so, you pass a list as the sole argument to `Popen()`. The first string in this list will be the executable filename of the program you want to launch and all the subsequent strings will be the command line arguments to pass to the program when it starts.
+
+Windows example:
+
+	>>> subprocess.Popen(['C:\\Windows\\notepad.exe', 'C:\\hello.txt'])
+	<subprocess.Popen object at 0x00000000032DCEB8>
+
+**Running Other Python Scripts**
+
+On Windows:
+
+	>>> subprocess.Popen(['C:\\python34\\python.exe', 'hello.py'])
+	<subprocess.Popen object at 0x000000000331CF28>
+
+**Opening Files with Default Applications**
+
+Each operating system has a program that performs the equivalent of double-clicking a document file to open it. On Windows, this is the `start` program. On OS X, this is the `open` program. On Ubuntu Linux, this is the `see` program.
+
+	>>> fileObj = open('hello.txt', 'w')
+	>>> fileObj.write('Hello world!')
+	12
+	>>> fileObj.close()
+	>>> import subprocess
+	>>> subprocess.Popen(['open', 'hello.txt'])
+
+On OS X, the open program is used for opening both document files and programs:
+
+	>>> subprocess.Popen(['open', '/Applications/Calculator.app/'])
+	<subprocess.Popen object at 0x10202ff98>
+
 ## Sending Email and Text Messages <a name="ch16">&nbsp;</a>
 
 ## Manipulating Images <a name="ch17">&nbsp;</a>
