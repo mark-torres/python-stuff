@@ -2448,6 +2448,249 @@ On OS X, the open program is used for opening both document files and programs:
 
 ## Sending Email and Text Messages <a name="ch16">&nbsp;</a>
 
+**IMPORTANT NOTE**
+
+NEVER WRITE A PASSWORD DIRECTLY INTO YOUR CODE! INSTEAD, DESIGN YOUR PROGRAM TO ACCEPT THE PASSWORD RETURNED FROM `input()`.
+
+### Sending Email (SMTP)
+
+Example:
+
+	>>> import smtplib
+	>>> smtpObj = smtplib.SMTP('smtp.example.com', 587)
+	>>> smtpObj.ehlo()
+	(250, b'mx.example.com at your service, [216.172.148.131]\nSIZE 35882577\
+	n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nCHUNKING')
+	>>> smtpObj.starttls()
+	(220, b'2.0.0 Ready to start TLS')
+	>>> smtpObj.login('bob@example.com', ' MY_SECRET_PASSWORD')
+	(235, b'2.7.0 Accepted')
+	>>> smtpObj.sendmail('bob@example.com', 'alice@example.com', 'Subject: So
+	long.\nDear Alice, so long and thanks for all the fish. Sincerely, Bob')
+	{}
+	>>> smtpObj.quit()
+	(221, b'2.0.0 closing connection ko10sm23097611pbd.52 - gsmtp')
+
+**Connecting to an SMTP Server**
+
+Email Providers and Their SMTP Servers:
+
+Provider | SMTP server domain name
+--- | ---
+Gmail | smtp.gmail.com
+Outlook.com/Hotmail.com | smtp-mail.outlook.com
+Yahoo Mail | smtp.mail.yahoo.com
+AT&T | smpt.mail.att.net (port 465)
+Comcast | smtp.comcast.net
+Verizon | smtp.verizon.net (port 465)
+
+Example connection on port 587:
+
+	>>> smtpObj = smtplib.SMTP('smtp.gmail.com', 587)
+	>>> type(smtpObj)
+	<class 'smtplib.SMTP'>
+
+If the `smptlib.SMTP()` call is not successful, your SMTP server might not support TLS on port 587. In this case, you will need to create an SMTP object using `smtplib.SMTP_SSL()` and port 465 instead.
+
+	>>> smtpObj = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+
+**Sending the SMTP "Hello" Message**
+
+This greeting is the first step in SMTP and is important for establishing a connection to the server.
+
+	>>> smtpObj.ehlo()
+	(250, b'mx.google.com at your service, [216.172.148.131]\nSIZE 35882577\
+	n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nCHUNKING')
+
+If the first item in the returned tuple is the integer 250 (the code for "success" in SMTP), then the greeting succeeded.
+
+**Starting TLS Encryption**
+
+If you are connecting to port 587 on the SMTP server (that is, you're using TLS encryption), you’ll need to call the `starttls()` method next. This required step enables encryption for your connection. If you are connecting to port 465 (using SSL), then encryption is already set up, and you should skip this step.
+
+	>>> smtpObj.starttls()
+	(220, b'2.0.0 Ready to start TLS')
+
+The 220 in the return value tells you that the server is ready.
+
+**Logging in to the SMTP Server**
+
+	>>> smtpObj.login(' my_email_address@gmail.com ', ' MY_SECRET_PASSWORD ')
+	(235, b'2.7.0 Accepted')
+
+**Sending an Email**
+
+	>>> smtpObj.sendmail(' my_email_address@gmail.com ', ' recipient@example.com ',
+	'Subject: So long.\nDear Alice, so long and thanks for all the fish. Sincerely,
+	Bob')
+	{}
+
+The start of the email body string must begin with `'Subject: \n'` for the subject line of the email. The `'\n'` newline character separates the subject line from the main body of the email.
+
+### Retrieving and Deleting Emails with IMAP
+
+**Connecting to an IMAP Server**
+
+Email Providers and Their IMAP Servers
+
+Provider | IMAP server domain name
+--- | ---
+Gmail | imap.gmail.com
+Outlook.com/Hotmail.com | imap-mail.outlook.com
+Yahoo Mail | imap.mail.yahoo.com
+AT&T | imap.mail.att.net
+Comcast | imap.comcast.net
+Verizon | incoming.verizon.net
+
+Example:
+
+	>>> import imapclient
+	>>> imapObj = imapclient.IMAPClient('imap.gmail.com', ssl=True)
+
+**Logging in to the IMAP Server**
+
+	>>> imapObj.login(' my_email_address@gmail.com ', ' MY_SECRET_PASSWORD ')
+
+**Selecting a Folder**
+
+	>>> import pprint
+	>>> pprint.pprint(imapObj.list_folders())
+	[(('\\HasNoChildren',), '/', 'Drafts'),
+	 (('\\HasNoChildren',), '/', 'Filler'),
+	 (('\\HasNoChildren',), '/', 'INBOX'),
+	 (('\\HasNoChildren',), '/', 'Sent'),
+	--snip-
+	 (('\\HasNoChildren', '\\Flagged'), '/', '[Gmail]/Starred'),
+	 (('\\HasNoChildren', '\\Trash'), '/', '[Gmail]/Trash')]
+
+The three values in each of the tuples are:
+
+* A tuple of the folder’s flags. (Exactly what these flags represent is beyond the scope of this book, and you can safely ignore this field.)
+* The delimiter used in the name string to separate parent folders and subfolders.
+* The full name of the folder.
+
+To select a folder to search through, pass the folder’s name as a string into the `IMAPClient` object’s `select_folder()` method:
+
+	>>> imapObj.select_folder('INBOX', readonly=True)
+
+If the selected folder does not exist, Python will raise an `imaplib.error` exception.
+
+The `readonly=True` keyword argument prevents you from accidentally making changes or deletions to any of the emails in this folder during the subsequent method calls. Unless you want to delete emails, it’s a good idea to always set `readonly` to `True`.
+
+**Performing the Search**
+
+With a folder selected, you can now search for emails with the `IMAPClient` object’s `search()` method.
+
+IMAP Search Keys:
+
+Search key | Meaning
+--- | ---
+'ALL' | Returns all messages in the folder. You may run in to imaplib size limits if you request all the messages in a large folder. See Size Limits.
+'BEFORE date', 'ON date', 'SINCE date' | These three search keys return, respectively, messages that were received by the IMAP server before, on, or after the given date. The date must be formatted like 05-Jul-2015. Also, while 'SINCE 05-Jul-2015' will match messages on and after July 5, 'BEFORE 05-Jul-2015' will match only messages before July 5 but not on July 5 itself.
+'SUBJECT string', 'BODY string', 'TEXT string' | Returns messages where string is found in the subject, body, or either, respectively. If string has spaces in it, then enclose it with double quotes: 'TEXT "search with spaces"'.
+'FROM string', 'TO string', 'CC string', 'BCC string' | Returns all messages where string is found in the "from" emailaddress, "to" addresses, "cc" (carbon copy) addresses, or "bcc" (blind carbon copy) addresses, respectively. If there are multiple email addresses in string, then separate them with spaces and enclose them all with double quotes: 'CC "firstcc@example.com secondcc@example.com"'.
+'SEEN', 'UNSEEN' | Returns all messages with and without the *\Seen* flag, respectively. An email obtains the *\Seen* flag if it has been accessed with a `fetch()` method call or if it is clicked when you’re checking your email in an email program or web browser. It’s more common to say the email has been "read" rather than "seen," but they mean the same thing.
+'ANSWERED', 'UNANSWERED' | Returns all messages with and without the *\Answered* flag, respectively. A message obtains the *\Answered* flag when it is replied to.
+'DELETED', 'UNDELETED' | Returns all messages with and without the *\Deleted* flag, respectively. Email messages deleted with the `delete_messages()` method are given the *\Deleted* flag but are not permanently deleted until the `expunge()` method is called. Note that some email providers, such as Gmail, automatically expunge emails.
+'DRAFT', 'UNDRAFT' | Returns all messages with and without the *\Draft* flag, respectively. Draft messages are usually kept in a separate *Drafts* folder rather than in the INBOX folder.
+'FLAGGED', 'UNFLAGGED' | Returns all messages with and without the *\Flagged* flag, respectively. This flag is usually used to mark email messages as "Important" or "Urgent."
+'LARGER N', 'SMALLER N' | Returns all messages larger or smaller than N bytes, respectively.
+'NOT search-key' | Returns the messages that search-key would not have returned.
+'OR search-key1 search-key2' | Returns the messages that match either the first or second search-key.
+
+Note that some IMAP servers may have slightly different implementations for how they handle their flags and search keys. It may require some experimentation in the interactive shell to see exactly how they behave.
+
+You can pass multiple IMAP search key strings in the list argument to the `search()` method.
+
+Search examples:
+
+* `imapObj.search(['ALL'])`. Returns every message in the currently selected folder.
+* `imapObj.search(['ON 05-Jul-2015'])`. Returns every message sent on July 5, 2015.
+* `imapObj.search(['SINCE 01-Jan-2015', 'BEFORE 01-Feb-2015', 'UNSEEN'])`. Returns every message sent in January 2015 that is unread. (Note that this means on and after January 1 and up to but not including February 1.)
+* `imapObj.search(['SINCE 01-Jan-2015', 'FROM alice@example.com'])`. Returns every message from alice@example.com sent since the start of 2015.
+* `imapObj.search(['SINCE 01-Jan-2015', 'NOT FROM alice@example.com'])`. Returns every message sent from everyone except alice@example.com since the start of 2015.
+* `imapObj.search(['OR FROM alice@example.com FROM bob@example.com'])`. Returns every message ever sent from alice@example.com or bob@example.com.
+* `imapObj.search(['FROM alice@example.com', 'FROM bob@example.com'])`. Trick example! This search will never return any messages, because messages must match all search keywords. Since there can be only one “from” address, it is impossible for a message to be from both alice@example.com and bob@example.com.
+
+The `search()` method returns unique IDs:
+
+	>>> UIDs = imapObj.search(['SINCE 05-Jul-2015'])
+	>>> UIDs
+	[40032, 40033, 40034, 40035, 40036, 40037, 40038, 40039, 40040, 40041]
+
+**Size Limits**
+
+If your search matches a large number of email messages, Python might raise an exception that says `imaplib.error: got more than 10000 bytes`. When this happens, you will have to disconnect and reconnect to the IMAP server and try again. You can change this limit from 10,000 bytes to 10,000,000 bytes by running this code:
+
+	>>> import imaplib
+	>>> imaplib._MAXLINE = 10000000
+
+You may want to make these two lines part of every IMAP program you write.
+
+**Fetching an Email and Marking It As Read**
+
+	>>> rawMessages = imapObj.fetch(UIDs, ['BODY[]'])
+	>>> import pprint
+	>>> pprint.pprint(rawMessages)
+	{40040: {'BODY[]': 'Delivered-To: my_email_address@gmail.com\r\n'
+	                   'Received: by 10.76.71.167 with SMTP id '
+	--snip--
+	                   '\r\n'
+	                   '------=_Part_6000970_707736290.1404819487066--\r\n',
+	         'SEQ': 5430}}
+
+When you selected a folder to search through, you called `select_folder()` with the `readonly=True` keyword argument. Doing this will prevent you from accidentally deleting an email—but it also means that emails will not get marked as read if you fetch them with the `fetch()` method. If you do want emails to be marked as read when you fetch them, you will need to pass `readonly=False` to `select_folder()`. If the selected folder is already in readonly mode, you can reselect the current folder with another call to `select_folder()`, this time with the `readonly=False` keyword argument:
+
+	>>> imapObj.select_folder('INBOX', readonly=False)
+
+**Getting Email Addresses from a Raw Message**
+
+The pyzmail module parses these raw messages and returns them as PyzMessage objects, which make the subject, body, `To` field, `From` field, and other sections of the email easily accessible to your Python code.
+
+	>>> import pyzmail
+	>>> message = pyzmail.PyzMessage.factory(rawMessages[40041]['BODY[]'])
+	>>> message.get_subject()
+	'Hello!'
+	>>> message.get_addresses('from')
+	[('Edward Snowden', 'esnowden@nsa.gov')]
+	>>> message.get_addresses('to')
+	[(Jane Doe', 'my_email_address@gmail.com')]
+	>>> message.get_addresses('cc')
+	[]
+	>>> message.get_addresses('bcc')
+	[]
+
+**Getting the Body from a Raw Message**
+
+	>>> message.text_part != None
+	True
+	>>> message.text_part.get_payload().decode(message.text_part.charset)
+	'So long, and thanks for all the fish!\r\n\r\n-Al\r\n'
+	>>> message.html_part != None
+	True
+	>>> message.html_part.get_payload().decode(message.html_part.charset)
+	'<div dir="ltr"><div>So long, and thanks for all the fish!<br><br></div>-Al
+	<br></div>\r\n'
+
+**Deleting Emails**
+
+	>>> imapObj.select_folder('INBOX', readonly=False)
+	>>> UIDs = imapObj.search(['ON 09-Jul-2015'])
+	>>> UIDs
+	[40066]
+	>>> imapObj.delete_messages(UIDs)
+	{40066: ('\\Seen', '\\Deleted')}
+	>>> imapObj.expunge()
+	('Success', [(5452, 'EXISTS')])
+
+**Disconnecting from the IMAP Server**
+
+	>>> imapObj.logout()``
+
+### Sending Text Messages with Twilio
+
+Twilio is an SMS gateway service, which means it’s a service that allows you to send text messages from your programs.
+
 ## Manipulating Images <a name="ch17">&nbsp;</a>
 
 ## Controlling the Keyboard and Mouse with GUI Automation <a name="ch18">&nbsp;</a>
