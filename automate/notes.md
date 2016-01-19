@@ -2693,4 +2693,149 @@ Twilio is an SMS gateway service, which means it’s a service that allows you t
 
 ## Manipulating Images <a name="ch17">&nbsp;</a>
 
+### Manipulating images with Pillow
+
+Pillow is a third-party Python module for interacting with image files. The module has several functions that make it easy to crop, resize, and edit the content of an image. With the power to manipulate images the same way you would with software such as Microsoft Paint or Adobe Photoshop, Python can automatically edit hundreds or thousands of images with ease.
+
+To install Pillow, run:
+
+	pip3 install pillow
+
+The module name of Pillow is PIL to make it backward compatible with an older module called Python Imaging Library, which is why you must run `from PIL import Image` instead of `from Pillow import Image`:
+
+	>>> from PIL import Image
+	>>> catIm = Image.open('zophie.png')
+
+**Working with the Image Data Type**
+
+	>>> from PIL import Image
+	>>> catIm = Image.open('zophie.png')
+	>>> catIm.size
+	(816, 1088)
+	>>> width, height = catIm.size
+	>>> width
+	816
+	>>> height
+	1088
+	>>> catIm.filename
+	'zophie.png'
+	>>> catIm.format
+	'PNG'
+	>>> catIm.format_description
+	'Portable network graphics'
+	>>> catIm.save('zophie.jpg')
+
+Pillow also provides the `Image.new()` function, which returns an Image object—much like `Image.open()`, except the image will be blank. The arguments to `Image.new()` are as follows:
+
+* The string 'RGBA', which sets the color mode to RGBA.
+* The size, as a two-integer tuple of the new image’s width and height.
+* The background color that the image should start with, as a four-integer tuple of an RGBA value. You can use the return value of the `ImageColor.getcolor()` function for this argument. Alternatively, `Image.new()` also supports just passing the string of the standard color name.
+
+Example:
+
+	>>> from PIL import Image
+	>>> im = Image.new('RGBA', (100, 200), 'purple')
+	>>> im.save('purpleImage.png')
+	>>> im2 = Image.new('RGBA', (20, 20))
+	>>> im2.save('transparentImage.png')
+
+**Cropping Images**
+
+	>>> croppedIm = catIm.crop((335, 345, 565, 560))
+	>>> croppedIm.save('cropped.png')
+
+**Copying and Pasting Images onto Other Images**
+
+Copy:
+
+	>>> catIm = Image.open('zophie.png')
+	>>> catCopyIm = catIm.copy()
+
+Paste:
+
+	>>> faceIm = catIm.crop((335, 345, 565, 560))
+	>>> faceIm.size
+	(230, 215)
+	>>> catCopyIm.paste(faceIm, (0, 0))
+	>>> catCopyIm.paste(faceIm, (400, 500))
+	>>> catCopyIm.save('pasted.png')
+
+**Pasting Transparent Pixels**
+
+If the image you want to paste has transparent pixels, pass the Image object as the third argument so that a solid rectangle isn’t pasted. This third argument is the "mask" Image object.
+
+**Resizing an Image**
+
+	>>> width, height = catIm.size
+	>>> quartersizedIm = catIm.resize((int(width / 2), int(height / 2)))
+	>>> quartersizedIm.save('quartersized.png')
+	>>> svelteIm = catIm.resize((width, height + 300))
+	>>> svelteIm.save('svelte.png')
+
+**Rotating and Flipping Images**
+
+	>>> catIm.rotate(90).save('rotated90.png')
+	>>> catIm.rotate(180).save('rotated180.png')
+	>>> catIm.rotate(270).save('rotated270.png')
+
+The `rotate()` method has an optional expand keyword argument that can be set to True to enlarge the dimensions of the image to fit the entire rotated new image.
+
+	>>> catIm.rotate(6).save('rotated6.png')
+	>>> catIm.rotate(6, expand=True).save('rotated6_expanded.png')
+
+You can also get a "mirror flip" of an image with the `transpose()` method. You must pass either `Image.FLIP_LEFT_RIGHT` or `Image.FLIP_TOP_BOTTOM` to the `transpose()` method.
+
+	>>> catIm.transpose(Image.FLIP_LEFT_RIGHT).save('horizontal_flip.png')
+	>>> catIm.transpose(Image.FLIP_TOP_BOTTOM).save('vertical_flip.png')
+
+**Changing Individual Pixels**
+
+	>>> im = Image.new('RGBA', (100, 100))
+	>>> im.getpixel((0, 0))
+	(0, 0, 0, 0)
+	>>> for x in range(100):
+		for y in range(50):
+			im.putpixel((x, y), (210, 210, 210))
+	>>> from PIL import ImageColor
+	>>> for x in range(100):
+			for y in range(50, 100):
+				im.putpixel((x, y), ImageColor.getcolor('darkgray', 'RGBA'))
+	>>> im.getpixel((0, 0))
+	(210, 210, 210, 255)
+	>>> im.getpixel((0, 50))
+	(169, 169, 169, 255)
+	>>> im.save('putPixel.png')
+
+### Drawing on Images
+
+	>>> from PIL import Image, ImageDraw
+	>>> im = Image.new('RGBA', (200, 200), 'white')
+	>>> draw = ImageDraw.Draw(im)
+
+**Drawing Shapes**
+
+	>>> from PIL import Image, ImageDraw
+	>>> im = Image.new('RGBA', (200, 200), 'white')
+	>>> draw = ImageDraw.Draw(im)
+	>>> draw.line([(0, 0), (199, 0), (199, 199), (0, 199), (0, 0)], fill='black')
+	>>> draw.rectangle((20, 30, 60, 60), fill='blue')
+	>>> draw.ellipse((120, 30, 160, 60), fill='red')
+	>>> draw.polygon(((57, 87), (79, 62), (94, 85), (120, 90), (103, 113)),
+	fill='brown')
+	>>> for i in range(100, 200, 10):
+			draw.line([(i, 0), (200, i - 100)], fill='green')
+	>>> im.save('drawing.png')
+
+**Drawing Text**
+
+	>>> from PIL import Image, ImageDraw, ImageFont
+	>>> import os
+	>>> im = Image.new('RGBA', (200, 200), 'white')
+	>>> draw = ImageDraw.Draw(im)
+	>>> draw.text((20, 150), 'Hello', fill='purple')
+	>>> fontsFolder = 'FONT_FOLDER' # e.g. 'Library/Fonts'
+	>>> arialFont = ImageFont.truetype(os.path.join(fontsFolder, 'arial.ttf'), 32)
+	>>> draw.text((100, 150), 'Howdy', fill='gray', font=arialFont)
+	>>> im.save('text.png')
+
 ## Controlling the Keyboard and Mouse with GUI Automation <a name="ch18">&nbsp;</a>
