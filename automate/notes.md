@@ -2078,7 +2078,7 @@ Example
 	<docx.text.Paragraph object at 0x0000000003B56F60>
 	>>> doc.save('helloworld.docx')
 
-You can add paragraphs by calling the `add_paragraph()` method again with the new paragraph’s text. Or to add text to the end of an existing paragraph, you can call the paragraph’s `add_run()` method and pass it a string.
+You can add paragraphs by calling the `add_paragraph()` method again with the new paragraph's text. Or to add text to the end of an existing paragraph, you can call the paragraph's `add_run()` method and pass it a string.
 
 	>>> import docx
 	>>> doc = docx.Document()
@@ -2090,7 +2090,7 @@ You can add paragraphs by calling the `add_paragraph()` method again with the ne
 	<docx.text.Run object at 0x0000000003A2C860>
 	>>> doc.save('multipleParagraphs.docx')
 
-Both `add_paragraph()` and `add_run()` accept an optional second argument that is a string of the `Paragraph` or `Run` object’s style. For example:
+Both `add_paragraph()` and `add_run()` accept an optional second argument that is a string of the `Paragraph` or `Run` object's style. For example:
 
 	>>> doc.add_paragraph('Hello world!', 'Title')
 
@@ -2177,7 +2177,7 @@ Python also comes with the special `csv` and `json` modules, each providing func
 	16
 	>>> outputFile.close()
 
-On Windows, you’ll also need to pass a blank string for the `open()` function’s `newline` keyword argument. For technical reasons beyond the scope of this book, if you forget to set the newline argument, the rows in output.csv will be double-spaced.
+On Windows, you'll also need to pass a blank string for the `open()` function's `newline` keyword argument. For technical reasons beyond the scope of this book, if you forget to set the newline argument, the rows in output.csv will be double-spaced.
 
 **The delimiter and lineterminator Keyword Arguments**
 
@@ -2311,7 +2311,7 @@ The datetime module also provides a timedelta data type, which represents a dura
 
 **Converting datetime Objects into Strings**
 
-The `strftime()` method uses directives similar to Python’s string formatting.
+The `strftime()` method uses directives similar to Python's string formatting.
 
 `strftime` directive | Meaning
 --- | ---
@@ -2371,7 +2371,7 @@ To make a separate thread, you first need to make a `Thread` object by calling t
 	
 	print('End of program.')
 
-**Passing Arguments to the Thread’s Target Function**
+**Passing Arguments to the Thread's Target Function**
 
 Example:
 
@@ -2402,7 +2402,7 @@ Ubuntu example:
 	>>> subprocess.Popen('/usr/bin/gnome-calculator')
 	<subprocess.Popen object at 0x7f2bcf93b20>
 
-The return value is a Popen object, which has two useful methods: `poll()` and `wait()`. The `poll()` method will return None if the process is still running at the time `poll()` is called. If the program has terminated, it will return the process's integer exit code. An exit code is used to indicate whether the process terminated without errors (an exit code of 0) or whether an error caused the process to terminate (a nonzero exit code—generally 1, but it may vary depending on the program). The `wait()` method will block until the launched process has terminated. This is helpful if you want your program to pause until the user finishes with the other program. The return value of `wait()` is the process’s integer exit code.
+The return value is a Popen object, which has two useful methods: `poll()` and `wait()`. The `poll()` method will return None if the process is still running at the time `poll()` is called. If the program has terminated, it will return the process's integer exit code. An exit code is used to indicate whether the process terminated without errors (an exit code of 0) or whether an error caused the process to terminate (a nonzero exit code—generally 1, but it may vary depending on the program). The `wait()` method will block until the launched process has terminated. This is helpful if you want your program to pause until the user finishes with the other program. The return value of `wait()` is the process's integer exit code.
 
 Windows example:
 
@@ -2506,7 +2506,7 @@ If the first item in the returned tuple is the integer 250 (the code for "succes
 
 **Starting TLS Encryption**
 
-If you are connecting to port 587 on the SMTP server (that is, you're using TLS encryption), you’ll need to call the `starttls()` method next. This required step enables encryption for your connection. If you are connecting to port 465 (using SSL), then encryption is already set up, and you should skip this step.
+If you are connecting to port 587 on the SMTP server (that is, you're using TLS encryption), you'll need to call the `starttls()` method next. This required step enables encryption for your connection. If you are connecting to port 465 (using SSL), then encryption is already set up, and you should skip this step.
 
 	>>> smtpObj.starttls()
 	(220, b'2.0.0 Ready to start TLS')
@@ -2565,21 +2565,21 @@ Example:
 
 The three values in each of the tuples are:
 
-* A tuple of the folder’s flags. (Exactly what these flags represent is beyond the scope of this book, and you can safely ignore this field.)
+* A tuple of the folder's flags. (Exactly what these flags represent is beyond the scope of this book, and you can safely ignore this field.)
 * The delimiter used in the name string to separate parent folders and subfolders.
 * The full name of the folder.
 
-To select a folder to search through, pass the folder’s name as a string into the `IMAPClient` object’s `select_folder()` method:
+To select a folder to search through, pass the folder's name as a string into the `IMAPClient` object's `select_folder()` method:
 
 	>>> imapObj.select_folder('INBOX', readonly=True)
 
 If the selected folder does not exist, Python will raise an `imaplib.error` exception.
 
-The `readonly=True` keyword argument prevents you from accidentally making changes or deletions to any of the emails in this folder during the subsequent method calls. Unless you want to delete emails, it’s a good idea to always set `readonly` to `True`.
+The `readonly=True` keyword argument prevents you from accidentally making changes or deletions to any of the emails in this folder during the subsequent method calls. Unless you want to delete emails, it's a good idea to always set `readonly` to `True`.
 
 **Performing the Search**
 
-With a folder selected, you can now search for emails with the `IMAPClient` object’s `search()` method.
+With a folder selected, you can now search for emails with the `IMAPClient` object's `search()` method.
 
 IMAP Search Keys:
 
@@ -2589,7 +2589,7 @@ Search key | Meaning
 'BEFORE date', 'ON date', 'SINCE date' | These three search keys return, respectively, messages that were received by the IMAP server before, on, or after the given date. The date must be formatted like 05-Jul-2015. Also, while 'SINCE 05-Jul-2015' will match messages on and after July 5, 'BEFORE 05-Jul-2015' will match only messages before July 5 but not on July 5 itself.
 'SUBJECT string', 'BODY string', 'TEXT string' | Returns messages where string is found in the subject, body, or either, respectively. If string has spaces in it, then enclose it with double quotes: 'TEXT "search with spaces"'.
 'FROM string', 'TO string', 'CC string', 'BCC string' | Returns all messages where string is found in the "from" emailaddress, "to" addresses, "cc" (carbon copy) addresses, or "bcc" (blind carbon copy) addresses, respectively. If there are multiple email addresses in string, then separate them with spaces and enclose them all with double quotes: 'CC "firstcc@example.com secondcc@example.com"'.
-'SEEN', 'UNSEEN' | Returns all messages with and without the *\Seen* flag, respectively. An email obtains the *\Seen* flag if it has been accessed with a `fetch()` method call or if it is clicked when you’re checking your email in an email program or web browser. It’s more common to say the email has been "read" rather than "seen," but they mean the same thing.
+'SEEN', 'UNSEEN' | Returns all messages with and without the *\Seen* flag, respectively. An email obtains the *\Seen* flag if it has been accessed with a `fetch()` method call or if it is clicked when you're checking your email in an email program or web browser. It's more common to say the email has been "read" rather than "seen," but they mean the same thing.
 'ANSWERED', 'UNANSWERED' | Returns all messages with and without the *\Answered* flag, respectively. A message obtains the *\Answered* flag when it is replied to.
 'DELETED', 'UNDELETED' | Returns all messages with and without the *\Deleted* flag, respectively. Email messages deleted with the `delete_messages()` method are given the *\Deleted* flag but are not permanently deleted until the `expunge()` method is called. Note that some email providers, such as Gmail, automatically expunge emails.
 'DRAFT', 'UNDRAFT' | Returns all messages with and without the *\Draft* flag, respectively. Draft messages are usually kept in a separate *Drafts* folder rather than in the INBOX folder.
@@ -2689,7 +2689,7 @@ The pyzmail module parses these raw messages and returns them as PyzMessage obje
 
 ### Sending Text Messages with Twilio
 
-Twilio is an SMS gateway service, which means it’s a service that allows you to send text messages from your programs.
+Twilio is an SMS gateway service, which means it's a service that allows you to send text messages from your programs.
 
 ## Manipulating Images <a name="ch17">&nbsp;</a>
 
@@ -2728,7 +2728,7 @@ The module name of Pillow is PIL to make it backward compatible with an older mo
 Pillow also provides the `Image.new()` function, which returns an Image object—much like `Image.open()`, except the image will be blank. The arguments to `Image.new()` are as follows:
 
 * The string 'RGBA', which sets the color mode to RGBA.
-* The size, as a two-integer tuple of the new image’s width and height.
+* The size, as a two-integer tuple of the new image's width and height.
 * The background color that the image should start with, as a four-integer tuple of an RGBA value. You can use the return value of the `ImageColor.getcolor()` function for this argument. Alternatively, `Image.new()` also supports just passing the string of the standard color name.
 
 Example:
@@ -2762,7 +2762,7 @@ Paste:
 
 **Pasting Transparent Pixels**
 
-If the image you want to paste has transparent pixels, pass the Image object as the third argument so that a solid rectangle isn’t pasted. This third argument is the "mask" Image object.
+If the image you want to paste has transparent pixels, pass the Image object as the third argument so that a solid rectangle isn't pasted. This third argument is the "mask" Image object.
 
 **Resizing an Image**
 
@@ -2839,3 +2839,156 @@ You can also get a "mirror flip" of an image with the `transpose()` method. You 
 	>>> im.save('text.png')
 
 ## Controlling the Keyboard and Mouse with GUI Automation <a name="ch18">&nbsp;</a>
+
+### Installing the pyautogui Module
+
+The pyautogui module can send virtual keypresses and mouse clicks to Windows, OS X, and Linux. Depending on which operating system you're using, you may have to install some other modules (called dependencies) before you can install PyAutoGUI.
+
+* On Windows, there are no other modules to install.
+* On OS X, run `sudo pip3 install pyobjc-framework-Quartz`, `sudo pip3 install pyobjc-core`, and then `sudo pip3 install pyobjc`.
+* On Linux, run `sudo pip3 install python3-xlib`, `sudo apt-get install scrot`, `sudo apt-get install python3-tk`, and `sudo apt-get install python3-dev`. (Scrot is a screenshot program that PyAutoGUI uses.)
+
+After these dependencies are installed, run `pip install pyautogui` (or `pip3` on OS X and Linux) to install PyAutoGUI.
+
+**INSTALLATION NOTE**
+
+`pyautogui` cannot be installed on Python 3.5 due to dependency problems. Works for Python 3.4.3.
+
+On Mac OS X, you can install Python 3.4.3 with `brew` from raw formula on github:
+
+	brew install https://raw.githubusercontent.com/Homebrew/homebrew/7d8b04c417d16f320680c58d0eb335cafd881849/Library/Formula/python3.rb
+
+**Pauses and Fail-Safes**
+
+You can tell your script to wait after every function call, giving you a short window to take control of the mouse and keyboard if something goes wrong. To do this, set the `pyautogui.PAUSE` variable to the number of seconds you want it to pause.
+
+PyAutoGUI also has a fail-safe feature. Moving the mouse cursor to the upper-left corner of the screen will cause PyAutoGUI to raise the `pyautogui.FailSafeException` exception. Your program can either handle this exception with `try` and `except` statements or let the exception crash your program.
+
+	>>> import pyautogui
+	>>> pyautogui.PAUSE = 1
+	>>> pyautogui.FAILSAFE = True
+
+### Controlling Mouse Movement
+
+The `pyautogui.size()` function returns a two-integer tuple of the screen's width and height in pixels.
+
+	>>> import pyautogui
+	>>> pyautogui.size()
+	(1920, 1080)
+	>>> width, height = pyautogui.size()
+
+**Moving the Mouse**
+
+The `pyautogui.moveTo()` function will instantly move the mouse cursor to a specified position on the screen. Integer values for the x- and y-coordinates make up the function's first and second arguments, respectively. An optional `duration` integer or float keyword argument specifies the number of seconds it should take to move the mouse to the destination.
+
+	>>> import pyautogui
+	>>> for i in range(10):
+			pyautogui.moveTo(100, 100, duration=0.25)
+			pyautogui.moveTo(200, 100, duration=0.25)
+			pyautogui.moveTo(200, 200, duration=0.25)
+			pyautogui.moveTo(100, 200, duration=0.25)
+
+The `pyautogui.moveRel()` function moves the mouse cursor relative to its current position.
+
+	>>> import pyautogui
+	>>> for i in range(10):
+			pyautogui.moveRel(100, 0, duration=0.25)
+			pyautogui.moveRel(0, 100, duration=0.25)
+			pyautogui.moveRel(-100, 0, duration=0.25)
+			pyautogui.moveRel(0, -100, duration=0.25)
+
+**Getting the Mouse Position**
+
+	>>> pyautogui.position()
+	(311, 622)
+	>>> pyautogui.position()
+	(377, 481)
+	>>> pyautogui.position()
+	(1536, 637)
+
+### Controlling Mouse Interaction
+
+**Clicking the Mouse**
+
+To send a virtual mouse click to your computer, call the `pyautogui.click()` method. By default, this click uses the left mouse button and takes place wherever the mouse cursor is currently located. You can pass x- and y-coordinates of the click as optional first and second arguments if you want it to take place somewhere other than the mouse's current position.
+
+	>>> import pyautogui
+	>>> pyautogui.click(10, 5)
+
+**Scrolling the Mouse**
+
+The final PyAutoGUI mouse function is `scroll()`, which you pass an integer argument for how many units you want to scroll the mouse up or down. The size of a unit varies for each operating system and application. Passing a positive integer scrolls up, and passing a negative integer scrolls down.
+
+	>>> import time, pyautogui
+	>>> time.sleep(5); pyautogui.scroll(100)
+
+### Working with the Screen
+
+PyAutoGUI has screenshot features that can create an image file based on the current contents of the screen. These functions can also return a Pillow Image object of the current screen's appearance.
+
+On Linux computers, the `scrot` program needs to be installed to use the screenshot functions in PyAutoGUI. In a Terminal window, run `sudo apt-get install scrot` to install this program.
+
+**Getting a Screenshot**
+
+	>>> import pyautogui
+	>>> im = pyautogui.screenshot()
+
+The `im` variable will contain the `Image` object of the screenshot. You can now call methods on the `Image` object in the im variable, just like any other `Image` object.
+
+**Analyzing the Screenshot**
+
+Before calling the `click()` method, you could take a screenshot and look at the pixel where the script is about to click. If it's not the same gray as the gray button, then your program knows something is wrong.
+
+PyAutoGUI's `pixelMatchesColor()` function will return True if the pixel at the given x- and y-coordinates on the screen matches the given color.
+
+	>>> import pyautogui
+	>>> im = pyautogui.screenshot()
+	>>> im.getpixel((50, 200))
+	(130, 135, 144)
+	>>> pyautogui.pixelMatchesColor(50, 200, (130, 135, 144))
+	True
+	>>> pyautogui.pixelMatchesColor(50, 200, (255, 135, 144))
+	False
+
+### Image Recognition
+
+Give PyAutoGUI an image of what you want to click and let it figure out the coordinates.
+
+	>>> import pyautogui
+	>>> pyautogui.locateOnScreen('submit.png')
+	(643, 745, 70, 29)
+
+The four-integer tuple that `locateOnScreen()` returns has the x-coordinate of the left edge, the y-coordinate of the top edge, the width, and the height for the first place on the screen the image was found.
+
+If the image cannot be found on the screen, `locateOnScreen()` will return None. Note that the image on the screen must match the provided image perfectly in order to be recognized. If the image is even a pixel off, `locateOnScreen()` will return `None`.
+
+If the image can be found in several places on the screen, `locateAllOnScreen()` will return a `Generator` object, which can be passed to `list()` to return a list of four-integer tuples.
+
+	>>> list(pyautogui.locateAllOnScreen('submit.png'))
+	[(643, 745, 70, 29), (1007, 801, 70, 29)]
+
+Once you have the four-integer tuple for the area on the screen where your image was found, you can click the center of this area by passing the tuple to the `center()` function to return x- and y-coordinates of the area’s center.
+
+	>>> pyautogui.locateOnScreen('submit.png')
+	(643, 745, 70, 29)
+	>>> pyautogui.center((643, 745, 70, 29))
+	(678, 759)
+	>>> pyautogui.click((678, 759))
+
+### Controlling the Keyboard
+
+**Sending a String from the Keyboard**
+
+	>>> pyautogui.click(100, 100); pyautogui.typewrite('Hello world!')
+
+By default, the `typewrite()` function will type the full string instantly. However, you can pass an optional second argument to add a short pause between each character.
+
+	>>> pyautogui.click(100, 100); pyautogui.typewrite('Hello world!', 0.25)
+
+**Key Names**
+
+Instead of a single string argument, a list of keyboard key strings can be passed to `typewrite()`.
+
+	>>> pyautogui.typewrite(['a', 'b', 'left', 'left', 'X', 'Y'])
+
+
