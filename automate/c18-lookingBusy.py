@@ -6,7 +6,7 @@ pyautogui.PAUSE = 0.3
 pyautogui.FAILSAFE = True
 # logging
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s - %(message)s')
-# logging.disable(logging.CRITICAL)
+logging.disable(logging.CRITICAL)
 
 # functions
 def nudgeMouse():
@@ -107,6 +107,7 @@ apps = {
 
 appNames = list(apps.keys())
 # find app icons on screen and save position
+print("Looking for apps..")
 for appName in apps:
 	try:
 		iconPos = pyautogui.locateOnScreen(apps[appName]['icon'])
