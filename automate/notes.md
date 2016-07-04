@@ -2852,9 +2852,9 @@ After these dependencies are installed, run `pip install pyautogui` (or `pip3` o
 
 **INSTALLATION NOTE**
 
-`pyautogui` cannot be installed on Python 3.5 due to dependency problems. Works for Python 3.4.3.
+`pyautogui` cannot be installed with Python 3.5 due to dependency problems on Mac OS X Yosemite but works for Python 3.4.3.
 
-On Mac OS X, you can install Python 3.4.3 with `brew` from raw formula on github:
+On Yosemite, you can install Python 3.4.3 with `brew` from raw formula on github:
 
 	brew install https://raw.githubusercontent.com/Homebrew/homebrew/7d8b04c417d16f320680c58d0eb335cafd881849/Library/Formula/python3.rb
 
