@@ -1,10 +1,69 @@
 #!/usr/bin/env python3
 import argparse, random
 
+# ====================
+# = ARGUMENTS PARSER =
+# ====================
+
+parser = argparse.ArgumentParser(description='Generates Bootstrap markup code for different components')
+
+parser.add_argument('--type','-t',
+	dest='argType',
+	required=True,
+	nargs=1,
+	choices=['tabpanel','form','form-nolabels','form-horizontal'],
+	help="Scaffold type")
+
+parser.add_argument('--data','-d',
+	dest='argData',
+	required=True,
+	nargs=1,
+	help="A quoted list of tab titles (for tabs) or fields (for forms), separated by comma.")
+
+args = parser.parse_args()
+
+argType = args.argType[0]
+argData = args.argData[0]
+
+# =============
+# = FUNCTIONS =
+# =============
+
 def str_to_var(str):
 	str = str.lower().strip()
 	tokens = str.split(' ')
 	return '_'.join(tokens)
+	
+def bstrap3_tabpanel(prefix, titles, varNames):
+	lines = []
+	lines.append('<style>')
+	lines.append('.tab-pane.active > .panel {border-top: 0;border-top-left-radius: 0;border-top-right-radius: 0;}')
+	lines.append('</style>')
+	lines.append('<div id="%s">' % (prefix))
+	# tabs
+	lines.append('\t<ul class="nav nav-tabs" role="tablist">')
+	for i in range( len(titles) ):
+		tabId = "%s_%s" % (prefix,varNames[i])
+		tabClass = 'active' if i == 0 else ''
+		lines.append('\t\t<li role="presentation" class="%s">' % (tabClass))
+		lines.append('\t\t\t<a data-target="#%s" aria-controls="%s" role="tab" data-toggle="tab">%s</a>' % (tabId, tabId, titles[i]))
+		lines.append('\t\t</li>')
+	lines.append('\t</ul>')
+	# tabs content
+	lines.append('\t<div class="tab-content">')
+	for i in range( len(titles) ):
+		tabId = "%s_%s" % (prefix,varNames[i])
+		tabClass = 'active' if i == 0 else ''
+		lines.append('\t\t<div role="tabpanel" class="tab-pane %s" id="%s">' % (tabClass, tabId))
+		lines.append('\t\t\t<!-- Tab %s starts -->' % (titles[i]))
+		lines.append('\t\t\t<div class="panel panel-default">')
+		lines.append('\t\t\t\tContent for %s tab' % (titles[i]))
+		lines.append('\t\t\t</div>')
+		lines.append('\t\t\t<!-- Tab %s ends -->' % (titles[i]))
+		lines.append('\t\t</div>')
+	lines.append('\t</div>')
+	lines.append('</div>')
+	return '\n'.join(lines)
 
 def bstrap3_form_horizontal(prefix, titles, varNames):
 	lines = []
@@ -56,27 +115,9 @@ def bstrap3_form_nolabels(prefix, titles, varNames):
 	lines.append('</form>')
 	return '\n'.join(lines)
 
-
-parser = argparse.ArgumentParser(description='Generates Bootstrap markup code for different components')
-
-parser.add_argument('--type','-t',
-	dest='argType',
-	required=True,
-	nargs=1,
-	choices=['tabpanel','form'],
-	help="Scaffold type")
-
-parser.add_argument('--data','-d',
-	dest='argData',
-	required=True,
-	nargs=1,
-	help="A quoted list of tab titles (for tabs) or fields (for forms), separated by comma.")
-
-
-args = parser.parse_args()
-
-argType = args.argType[0]
-argData = args.argData[0]
+# ==================
+# = IMPLEMENTATION =
+# ==================
 
 argData = argData.strip(',').strip()
 names = argData.split(',')
@@ -93,10 +134,13 @@ for i in range( len(names) ):
 		titles = titles + [ names[i].title() ]
 		varNames = varNames + [ str_to_var(names[i]) ]
 
-print(bstrap3_form(prefix, titles, varNames))
-print("\n\n")
-print(bstrap3_form_horizontal(prefix, titles, varNames))
-print("\n\n")
-print(bstrap3_form_nolabels(prefix, titles, varNames))
-
-
+if argType == 'tabpanel':
+	print(bstrap3_tabpanel(prefix, titles, varNames))
+elif argType == 'form':
+	print(bstrap3_form(prefix, titles, varNames))
+elif argType == 'form-horizontal':
+	print(bstrap3_form_horizontal(prefix, titles, varNames))
+elif argType == 'form-nolabels':
+	print(bstrap3_form_nolabels(prefix, titles, varNames))
+else:
+	print("Unrecognized option: %s" % (argType))
