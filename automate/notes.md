@@ -776,6 +776,13 @@ Strings use indexes and slices the same way lists do.
 	>>> spam[6:]
 	'world!'
 
+As you can see, you can access all the characters the string just like a list, but you can't use any of the list member functions like `append`. If you need to convert the string into a list of single characters, use the `list` function:
+
+	>>> spam = 'Hello!'
+	>>> letters = list(spam)
+	>>> letters
+	>>> ['H','e','l','l','o','!']
+
 ### The in and not in Operators with Strings
 
 The `in` and `not in` operators can be used with strings just like with list values.

@@ -11,14 +11,14 @@ parser.add_argument('--type','-t',
 	dest='argType',
 	required=True,
 	nargs=1,
-	choices=['tabpanel','form','form-nolabels','form-horizontal'],
+	choices=['tabpanel','form','form-nolabels','form-horizontal','modal'],
 	help="Scaffold type")
 
 parser.add_argument('--data','-d',
 	dest='argData',
 	required=True,
 	nargs=1,
-	help="A quoted list of tab titles (for tabs) or fields (for forms), separated by comma.")
+	help="A quoted list of tab titles (for tabs and modals) or fields (for forms), separated by comma.")
 
 args = parser.parse_args()
 
@@ -36,6 +36,7 @@ def str_to_var(str):
 	
 def bstrap3_tabpanel(prefix, titles, varNames):
 	lines = []
+	lines.append('<!-- Tabs http://getbootstrap.com/javascript/#tabs -->')
 	lines.append('<style>')
 	lines.append('.tab-pane.active > .panel {border-top: 0;border-top-left-radius: 0;border-top-right-radius: 0;}')
 	lines.append('</style>')
@@ -68,6 +69,7 @@ def bstrap3_tabpanel(prefix, titles, varNames):
 def bstrap3_form_horizontal(prefix, titles, varNames):
 	lines = []
 	# start form
+	lines.append('<!-- Forms http://getbootstrap.com/css/#forms -->')
 	lines.append('<form id="%s" class="form-horizontal">' % (prefix) )
 	for i in range( len(titles) ):
 		fieldId = "%s_%s" % (prefix,varNames[i])
@@ -89,6 +91,7 @@ def bstrap3_form_horizontal(prefix, titles, varNames):
 def bstrap3_form(prefix, titles, varNames):
 	lines = []
 	# start form
+	lines.append('<!-- Forms http://getbootstrap.com/css/#forms -->')
 	lines.append('<form id="%s">' % (prefix) )
 	for i in range( len(titles) ):
 		fieldId = "%s_%s" % (prefix,varNames[i])
@@ -104,6 +107,7 @@ def bstrap3_form(prefix, titles, varNames):
 def bstrap3_form_nolabels(prefix, titles, varNames):
 	lines = []
 	# start form
+	lines.append('<!-- Forms http://getbootstrap.com/css/#forms -->')
 	lines.append('<form id="%s">' % (prefix) )
 	for i in range( len(titles) ):
 		fieldId = "%s_%s" % (prefix,varNames[i])
@@ -113,6 +117,33 @@ def bstrap3_form_nolabels(prefix, titles, varNames):
 	lines.append('\t<div class="alert alert-danger" role="alert" id="%s_error_msg" style="display: none;">Some error</div>' % (prefix))
 	lines.append('\t<button type="submit" class="btn btn-primary">Submit</button>')
 	lines.append('</form>')
+	return '\n'.join(lines)
+
+def bstrap3_modal(prefix, title):
+	lines = []
+	lines.append('<!-- modal http://getbootstrap.com/javascript/#modals -->')
+	lines.append('<div id="%s" class="modal fade" tabindex="-1" role="dialog">' % (prefix))
+	lines.append('\t<div class="modal-dialog" role="document"><!-- optional sizes: modal-lg|modal-sm -->')
+	lines.append('\t\t<div class="modal-content">')
+	lines.append('\t\t\t<!-- modal header -->')
+	lines.append('\t\t\t<div class="modal-header">')
+	lines.append('\t\t\t\t<button type="button" class="close" data-dismiss="modal" aria-label="Close">')
+	lines.append('\t\t\t\t\t<span aria-hidden="true">&times;</span>')
+	lines.append('\t\t\t\t</button>')
+	lines.append('\t\t\t\t<h4 class="modal-title">%s</h4>' % (title))
+	lines.append('\t\t\t</div>')
+	lines.append('\t\t\t<!-- modal body -->')
+	lines.append('\t\t\t<div class="modal-body">')
+	lines.append('\t\t\t\t<p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</p>')
+	lines.append('\t\t\t</div>')
+	lines.append('\t\t\t<!-- modal footer -->')
+	lines.append('\t\t\t<div class="modal-footer">')
+	lines.append('\t\t\t\t<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>')
+	lines.append('\t\t\t\t<button type="button" class="btn btn-primary">Save changes</button>')
+	lines.append('\t\t\t</div>')
+	lines.append('\t\t</div>')
+	lines.append('\t</div>')
+	lines.append('</div>')
 	return '\n'.join(lines)
 
 # ==================
@@ -142,5 +173,7 @@ elif argType == 'form-horizontal':
 	print(bstrap3_form_horizontal(prefix, titles, varNames))
 elif argType == 'form-nolabels':
 	print(bstrap3_form_nolabels(prefix, titles, varNames))
+elif argType == 'modal':
+	print(bstrap3_modal(prefix, titles[0]))
 else:
 	print("Unrecognized option: %s" % (argType))

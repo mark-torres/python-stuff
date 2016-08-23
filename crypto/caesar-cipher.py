@@ -76,10 +76,10 @@ elif (plainMessage != None and secretMessage != None):
 	sys.exit()
 
 if (plainMessage != None):
-	print("Plain message: %s" % (plainMessage))
+	# print("Plain message: %s" % (plainMessage))
 	print("Encrypted message: %s" % (caesar_encrypt(cipherKey, plainMessage)))
 elif (secretMessage != None):
-	print("Encrypted message: %s" % (secretMessage))
+	# print("Encrypted message: %s" % (secretMessage))
 	print("Plain message: %s" % (caesar_decrypt(cipherKey, secretMessage)))
 
 
