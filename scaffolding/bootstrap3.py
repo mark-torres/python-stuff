@@ -11,7 +11,7 @@ parser.add_argument('--type','-t',
 	dest='argType',
 	required=True,
 	nargs=1,
-	choices=['tabpanel','form','form-nolabels','form-horizontal','modal'],
+	choices=['tabpanel','form','form-nolabels','form-horizontal','modal','dropdown','btn-group'],
 	help="Scaffold type")
 
 parser.add_argument('--data','-d',
@@ -146,6 +146,43 @@ def bstrap3_modal(prefix, title):
 	lines.append('</div>')
 	return '\n'.join(lines)
 
+def bstrap3_dropdown(prefix, titles):
+	lines = []
+	lines.append('<!-- dropdown http://getbootstrap.com/components/#dropdowns -->')
+	lines.append('<!-- change .dropdown to .dropup if you want it to expand upwards -->')
+	lines.append('<div class="dropdown">')
+	lines.append('\t<button class="btn btn-default dropdown-toggle" type="button" id="%s" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' % (prefix))
+	lines.append('\t\tDropdown')
+	lines.append('\t\t<span class="caret"></span>')
+	lines.append('\t</button>')
+	lines.append('\t<ul class="dropdown-menu" aria-labelledby="%s">' % (prefix))
+	lines.append('\t\t<li class="dropdown-header">Delete me or edit me</li>')
+	for i in range( len(titles) ):
+		lines.append('\t\t<li><a href="#">%s</a></li>' % (titles[i]))
+	lines.append('\t\t<li role="separator" class="divider"></li>')
+	lines.append('\t\t<li><a href="#">Delete me</a></li>')
+	lines.append('\t</ul>')
+	lines.append('</div>')
+	return '\n'.join(lines)
+	
+def bstrap3_btn_group(titles):
+	lines = []
+	lines.append('<div class="btn-group" role="group" aria-label="...">')
+	for i in range( len(titles) ):
+		lines.append('\t<button type="button" class="btn btn-default">%s</button>' % (titles[i]))
+	lines.append('</div>')
+	return '\n'.join(lines)
+	
+def bstrap3_basic_panel():
+	lines = []
+	lines.append('<!-- Basic panel -->')
+	lines.append('<div class="panel panel-default">')
+	lines.append('\t<div class="panel-body">')
+	lines.append('\t\tPanel body')
+	lines.append('\t</div>')
+	lines.append('</div>')
+	return '\n'.join(lines)
+
 # ==================
 # = IMPLEMENTATION =
 # ==================
@@ -167,13 +204,20 @@ for i in range( len(names) ):
 
 if argType == 'tabpanel':
 	print(bstrap3_tabpanel(prefix, titles, varNames))
-elif argType == 'form':
-	print(bstrap3_form(prefix, titles, varNames))
-elif argType == 'form-horizontal':
-	print(bstrap3_form_horizontal(prefix, titles, varNames))
-elif argType == 'form-nolabels':
-	print(bstrap3_form_nolabels(prefix, titles, varNames))
+elif argType == 'dropdown':
+	print(bstrap3_dropdown(prefix, titles))
 elif argType == 'modal':
 	print(bstrap3_modal(prefix, titles[0]))
+elif argType == 'btn-group':
+	print(bstrap3_btn_group(titles))
+elif argType == 'form':
+	print(bstrap3_basic_panel())
+	print(bstrap3_form(prefix, titles, varNames))
+elif argType == 'form-horizontal':
+	print(bstrap3_basic_panel())
+	print(bstrap3_form_horizontal(prefix, titles, varNames))
+elif argType == 'form-nolabels':
+	print(bstrap3_basic_panel())
+	print(bstrap3_form_nolabels(prefix, titles, varNames))
 else:
 	print("Unrecognized option: %s" % (argType))
