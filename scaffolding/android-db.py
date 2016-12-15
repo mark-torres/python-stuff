@@ -11,7 +11,7 @@ parser.add_argument('--model','-m',
 	dest='model',
 	required=True,
 	nargs=1,
-	help="Model (table) name")
+	help="Singularized model name. (e.g. 'user' not 'users')")
 
 parser.add_argument('--fields','-f',
 	dest='fields',
@@ -33,9 +33,11 @@ def parse_fields(fieldsString):
 	fields = fieldsString.split(';')
 	for i in range( len(fields) ):
 		field = fields[i].strip()
-		if(len(field.split(':')) == 2):
-			fieldName, fieldType = field.split(':')
-			definitions[fieldName] = fieldType.upper()
+		parts = field.split(':')
+		if(len(parts) == 2):
+			definitions[ parts[0] ] = {'type': parts[1].upper(), 'indexed': False}
+		if(len(parts) == 3 and parts[2] == "i"):
+			definitions[ parts[0] ] = {'type': parts[1].upper(), 'indexed': True}
 	return definitions
 	
 def camel_case_str(planeString):
@@ -62,31 +64,64 @@ def print_header(title, size):
 	title = title.strip()
 	title = title.upper()
 	print("// " + " ".rjust(25, "*") + title.center(size, " ") + " ".ljust(25,"*"))
+
 # ==================
 # = IMPLEMENTATION =
 # ==================
-
 fieldDefs = parse_fields(fields)
-
-modelUpper = model.upper()
-fieldsVar = "COLS_%s_TABLE" % (modelUpper)
-modelClass = class_name_str(model)
-
-print_header("variable definitions", 30)
-print("private static final String TBL_%s = \"%s\";" % (modelUpper, model))
-print("private static final String CREATE_TBL_%s = \"CREATE TABLE IF NOT EXISTS \" + TBL_%s + \" (\" +" % (modelUpper, modelUpper))
-print("\t\"_ID integer PRIMARY KEY AUTOINCREMENT NOT NULL\" +")
-print("\t\");\";")
-print("private static final HashMap<String, String> %s = new HashMap<>();" % (fieldsVar))
-print("\n")
-
-print_header("Structure definition", 30)
+indexedFields = []
 for field in fieldDefs.keys():
-	print("%s.put(\"%s\", \"%s\");" % (fieldsVar, field, fieldDefs[field]))
+	if(fieldDefs[field]['indexed']):
+		indexedFields.append(field)
+
+print(indexedFields)
+
+model = model.lower()
+modelClass = class_name_str(model)
+modelTable = model + "s"
+modelTableUpper = modelTable.upper()
+# fieldsVar = "COL_DEF_%s" % (modelTableUpper)
+# indexesVar = "IDX_DEF_%s" % (modelTableUpper)
+
+print_header("contract class", 30)
+print("public final class MyDbContract {")
+print("\t// To prevent someone from accidentally instantiating the contract class,")
+print("\t// make the constructor private.")
+print("\tprivate MyDbContract() {}")
+print("\t/* Inner class that defines the table contents */")
+print("\tpublic final class %sSchema implements BaseColumns {" % (modelClass))
+print("\t\tpublic static final String TABLE_NAME = \"%s\";" % (modelTable))
+print("\t\tpublic static final String SQL_CREATE_TABLE = \"CREATE TABLE IF NOT EXISTS \" + TABLE_NAME + \" (\" +")
+print("\t\t\t\"_ID integer PRIMARY KEY AUTOINCREMENT NOT NULL\" +")
+print("\t\t\t\");\";")
+print("\t\tpublic static final String SQL_EMPTY_TABLE = \"DELETE FROM \" + TABLE_NAME;")
+
+print("\t\t// Columns names")
+for field in fieldDefs.keys():
+	print("\t\tpublic static final String COLUMN_NAME_%s = \"%s\";" % (field.upper(), field))
+
+print("\t\t// Column definitions")
+print("\t\tpublic static final HashMap<String, String> COL_DEFS;")
+print("\t\tstatic {")
+print("\t\t\tCOL_DEFS = new HashMap<>();")
+for field in fieldDefs.keys():
+	print("\t\t\tCOL_DEFS.put(COLUMN_NAME_%s, \"%s\");" % (field.upper(), fieldDefs[field]['type']))
+print("\t\t}")
+
+print("\t\t// Column indexes")
+print("\t\tpublic static final HashMap<String, Boolean> COL_IDX;")
+print("\t\tstatic {")
+print("\t\t\tCOL_IDX = new HashMap<>();")
+for field in fieldDefs.keys():
+	print("\t\t\tCOL_IDX.put(COLUMN_NAME_%s, %s);" % (field.upper(), 'true' if fieldDefs[field]['indexed'] else 'false'))
+print("\t\t}")
+
+print("\t}")
+print("}")
 print("\n")
 
 print_header("helper methods", 30)
-print("private void checkTableStructure(SQLiteDatabase db, String tableName, HashMap<String, String> tableFields) {")
+print("private void checkTableStructure(SQLiteDatabase db, String tableName, HashMap<String, String> tableFields, HashMap<String, Boolean> tableIndexes) {")
 print("\t// get table columns")
 print("\tSystem.out.println(\"Checking table structure for:\" + tableName);")
 print("\tArrayList<String> currentFields = new ArrayList<>();")
@@ -111,15 +146,15 @@ print("}")
 print("@Override")
 print("public void onCreate(SQLiteDatabase db) {")
 print("\t// create tables")
-print("\tdb.execSQL(CREATE_TBL_%s);" % (modelUpper))
+print("\tdb.execSQL(%sSchema.SQL_CREATE_TABLE);" % (modelClass))
 print("\t// complete table structure")
-print("\tcheckTableStructure(db, TBL_%s, %s);" % (modelUpper, fieldsVar))
+print("\tcheckTableStructure(db, %sSchema.TABLE_NAME, %sSchema.COL_DEFS, %sSchema.COL_IDX);" % (modelClass, modelClass, modelClass))
 print("}")
 
 print("@Override")
 print("public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {")
 print("\t// check table structure")
-print("\tcheckTableStructure(db, TBL_%s, %s);" % (modelUpper, fieldsVar))
+print("\tcheckTableStructure(db, %sSchema.TABLE_NAME, %sSchema.COL_DEFS, %sSchema.COL_IDX);" % (modelClass, modelClass, modelClass))
 print("}")
 
 # print("\n")
