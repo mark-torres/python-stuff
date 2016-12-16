@@ -120,6 +120,19 @@ print("\t}")
 print("}")
 print("\n")
 
+print_header("Model data class", 30)
+print("public class %sData {" % (modelClass))
+print("\tpublic long localId;")
+for field in fieldDefs.keys():
+	print("\tpublic String %s;" % (camel_case_str(field)))
+print("")
+print("\tpublic %sData() {" % (modelClass))
+for field in fieldDefs.keys():
+	print("\t\t%s = \"\";" % (camel_case_str(field)))
+print("\t}")
+print("}")
+print("\n")
+
 print_header("helper methods", 30)
 print("private void checkTableStructure(SQLiteDatabase db, String tableName, HashMap<String, String> tableFields, HashMap<String, Boolean> tableIndexes) {")
 print("\t// get table columns")
@@ -156,5 +169,16 @@ print("public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
 print("\t// check table structure")
 print("\tcheckTableStructure(db, %sSchema.TABLE_NAME, %sSchema.COL_DEFS, %sSchema.COL_IDX);" % (modelClass, modelClass, modelClass))
 print("}")
+print("\n")
+
+print_header("Usage code", 30)
+print("// Column indexes")
+for field in fieldDefs.keys():
+	print("%s.%s = cursor.getString(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % (model, camel_case_str(field), modelClass, field.upper()))
+print("")
+print("// Content values")
+print("ContentValues values = new ContentValues();")
+for field in fieldDefs.keys():
+	print("values.put(%sSchema.COLUMN_NAME_%s, %s.%s);" % (modelClass, field.upper(), model, camel_case_str(field)))
 
 # print("\n")
