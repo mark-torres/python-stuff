@@ -13,27 +13,27 @@ parser.add_argument('--model','-m',
 	nargs=1,
 	help="Singularized model name. (e.g. 'user' not 'users')")
 
-parser.add_argument('--fields','-f',
-	dest='fields',
+parser.add_argument('--columns','-c',
+	dest='columns',
 	required=True,
 	nargs=1,
-	help="A single quoted list of field definitions (excluding primary key _ID) for the model, separated by semicolon. Example: 'name:varchar(100);age:smallint;weight:decimal(4,2)'")
+	help="A single quoted list of column definitions (excluding primary key _ID) for the model, separated by semicolon. Example: 'name:varchar(100);age:smallint;weight:decimal(4,2)'")
 
 args = parser.parse_args()
 
 model = args.model[0]
-fields = args.fields[0]
+columns = args.columns[0]
 
 # =============
 # = FUNCTIONS =
 # =============
-def parse_fields(fieldsString):
-	"""Parse field definitions"""
+def parse_columns(colsString):
+	"""Parse column definitions"""
 	definitions = {}
-	fields = fieldsString.split(';')
-	for i in range( len(fields) ):
-		field = fields[i].strip()
-		parts = field.split(':')
+	columns = colsString.split(';')
+	for i in range( len(columns) ):
+		column = columns[i].strip()
+		parts = column.split(':')
 		if(len(parts) == 2):
 			definitions[ parts[0] ] = {'type': parts[1].upper(), 'indexed': False}
 		if(len(parts) == 3 and parts[2] == "i"):
@@ -68,20 +68,17 @@ def print_header(title, size):
 # ==================
 # = IMPLEMENTATION =
 # ==================
-fieldDefs = parse_fields(fields)
-indexedFields = []
-for field in fieldDefs.keys():
-	if(fieldDefs[field]['indexed']):
-		indexedFields.append(field)
-
-print(indexedFields)
+colDefs = parse_columns(columns)
+indexedColumns = []
+for column in colDefs.keys():
+	if(colDefs[column]['indexed']):
+		indexedColumns.append(column)
 
 model = model.lower()
 modelClass = class_name_str(model)
+modelObj = camel_case_str(model)
 modelTable = model + "s"
 modelTableUpper = modelTable.upper()
-# fieldsVar = "COL_DEF_%s" % (modelTableUpper)
-# indexesVar = "IDX_DEF_%s" % (modelTableUpper)
 
 print_header("contract class", 30)
 print("public final class MyDbContract {")
@@ -97,23 +94,24 @@ print("\t\t\t\");\";")
 print("\t\tpublic static final String SQL_EMPTY_TABLE = \"DELETE FROM \" + TABLE_NAME;")
 
 print("\t\t// Columns names")
-for field in fieldDefs.keys():
-	print("\t\tpublic static final String COLUMN_NAME_%s = \"%s\";" % (field.upper(), field))
+for column in colDefs.keys():
+	print("\t\tpublic static final String COLUMN_NAME_%s = \"%s\";" % (column.upper(), column))
 
 print("\t\t// Column definitions")
 print("\t\tpublic static final HashMap<String, String> COL_DEFS;")
 print("\t\tstatic {")
 print("\t\t\tCOL_DEFS = new HashMap<>();")
-for field in fieldDefs.keys():
-	print("\t\t\tCOL_DEFS.put(COLUMN_NAME_%s, \"%s\");" % (field.upper(), fieldDefs[field]['type']))
+for column in colDefs.keys():
+	print("\t\t\tCOL_DEFS.put(COLUMN_NAME_%s, \"%s\");" % (column.upper(), colDefs[column]['type']))
 print("\t\t}")
 
 print("\t\t// Column indexes")
 print("\t\tpublic static final HashMap<String, Boolean> COL_IDX;")
 print("\t\tstatic {")
 print("\t\t\tCOL_IDX = new HashMap<>();")
-for field in fieldDefs.keys():
-	print("\t\t\tCOL_IDX.put(COLUMN_NAME_%s, %s);" % (field.upper(), 'true' if fieldDefs[field]['indexed'] else 'false'))
+print("\t\t\tCOL_IDX.put(\"_ID\", true);")
+for column in colDefs.keys():
+	print("\t\t\tCOL_IDX.put(COLUMN_NAME_%s, %s);" % (column.upper(), 'true' if colDefs[column]['indexed'] else 'false'))
 print("\t\t}")
 
 print("\t}")
@@ -123,35 +121,56 @@ print("\n")
 print_header("Model data class", 30)
 print("public class %sData {" % (modelClass))
 print("\tpublic long localId;")
-for field in fieldDefs.keys():
-	print("\tpublic String %s;" % (camel_case_str(field)))
+for column in colDefs.keys():
+	print("\tpublic String %s;" % (camel_case_str(column)))
 print("")
 print("\tpublic %sData() {" % (modelClass))
-for field in fieldDefs.keys():
-	print("\t\t%s = \"\";" % (camel_case_str(field)))
+print("\t\tlocalId = 0;")
+for column in colDefs.keys():
+	print("\t\t%s = \"\";" % (camel_case_str(column)))
 print("\t}")
 print("}")
 print("\n")
 
 print_header("helper methods", 30)
-print("private void checkTableStructure(SQLiteDatabase db, String tableName, HashMap<String, String> tableFields, HashMap<String, Boolean> tableIndexes) {")
-print("\t// get table columns")
-print("\tSystem.out.println(\"Checking table structure for:\" + tableName);")
-print("\tArrayList<String> currentFields = new ArrayList<>();")
-print("\tCursor cursorTable = db.rawQuery(\"PRAGMA table_info(\" + tableName + \")\", null);")
-print("\tint iName = cursorTable.getColumnIndex(\"name\");")
+print("private void checkTableStructure(SQLiteDatabase db, String tableName, HashMap<String, String> tableColumns, HashMap<String, Boolean> tableIndexes) {")
+print("\t// Get columns")
+print("\tArrayList<String> currentColumns = new ArrayList<>();")
+print("\tString tableQuery = \"PRAGMA table_info(\" + tableName + \")\";")
+# print("\tif (inDebugMode) System.out.println(tableQuery);")
+print("\tCursor cursorTable = db.rawQuery(tableQuery, null);")
 print("\twhile(cursorTable.moveToNext()) {")
-print("\t\tString fieldName = cursorTable.getString(iName);")
-print("\t\tcurrentFields.add(fieldName);")
+print("\t\tString columnName = cursorTable.getString(cursorTable.getColumnIndex(\"name\"));")
+print("\t\tcurrentColumns.add(columnName);")
 print("\t}")
 print("\tcursorTable.close();")
-print("\t// compare to required fields")
-print("\tfor(String field: tableFields.keySet()) {")
-print("\t\tif(!currentFields.contains(field)) {")
-print("\t\t\t// add field if not in table")
-print("\t\t\tSystem.out.println(\"Adding \" + field + \" field to table \" + tableName);")
-print("\t\t\tString query = \"ALTER TABLE \" + tableName + \" ADD \" + field + \" \" + tableFields.get(field) + \";\";")
+print("\t// Compare to required columns")
+print("\tfor(String column: tableColumns.keySet()) {")
+print("\t\tif(!currentColumns.contains(column)) {")
+print("\t\t\t// add column if not in table")
+print("\t\t\tString query = \"ALTER TABLE \" + tableName + \" ADD \" + column + \" \" + tableColumns.get(column) + \";\";")
+# print("\t\t\tif (inDebugMode) System.out.println(query);")
 print("\t\t\tdb.execSQL(query);")
+print("\t\t}")
+print("\t}")
+print("\t// Get indexes")
+print("\tString indexQuery = \"SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = '\" + tableName + \"';\";")
+# print("\tif (inDebugMode) System.out.println(indexQuery);")
+print("\tCursor cursorIndex = db.rawQuery(indexQuery, null);")
+print("\tArrayList<String> currentIndexes = new ArrayList<>();")
+print("\twhile (cursorIndex.moveToNext()) {")
+print("\t\tString indexName = cursorIndex.getString(cursorIndex.getColumnIndex(\"name\"));")
+print("\t\tcurrentIndexes.add(indexName);")
+print("\t}")
+print("\tcursorIndex.close();")
+print("\t// Compare to required indexes")
+print("\tfor (String colName: tableIndexes.keySet()) {")
+print("\t\tString indexName = tableName + \"_\" + colName;")
+print("\t\tif (tableIndexes.get(colName) && !currentIndexes.contains(indexName)) {")
+print("\t\t\t// add if not exists")
+print("\t\t\tString sql = \"CREATE INDEX IF NOT EXISTS \" + indexName + \" ON \" + tableName + \" (\" + colName + \" ASC);\";")
+# print("\t\t\tif (inDebugMode) System.out.println(sql);")
+print("\t\t\tdb.execSQL(sql);")
 print("\t\t}")
 print("\t}")
 print("}")
@@ -173,12 +192,12 @@ print("\n")
 
 print_header("Usage code", 30)
 print("// Column indexes")
-for field in fieldDefs.keys():
-	print("%s.%s = cursor.getString(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % (model, camel_case_str(field), modelClass, field.upper()))
+for column in colDefs.keys():
+	print("%s.%s = cursor.getString(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % (modelObj, camel_case_str(column), modelClass, column.upper()))
 print("")
 print("// Content values")
 print("ContentValues values = new ContentValues();")
-for field in fieldDefs.keys():
-	print("values.put(%sSchema.COLUMN_NAME_%s, %s.%s);" % (modelClass, field.upper(), model, camel_case_str(field)))
+for column in colDefs.keys():
+	print("values.put(%sSchema.COLUMN_NAME_%s, %s.%s);" % (modelClass, column.upper(), modelObj, camel_case_str(column)))
 
 # print("\n")
