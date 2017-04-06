@@ -189,6 +189,7 @@ groupGrey = {
 htmlGroups = {
 	"Pink"   : groupPink,
 	"Purple" : groupPurple,
+	"Red"    : groupRed,
 	"Orange" : groupOrange,
 	"Yellow" : groupYellow,
 	"Green"  : groupGreen,
