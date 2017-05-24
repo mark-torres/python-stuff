@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse
+import argparse, html
 
 # ====================
 # = ARGUMENTS PARSER =
@@ -379,13 +379,19 @@ materialGroups = {
 # =============
 
 def android_color(colorName, hexCode):
-	print("<color name=\"material%s\">%s</color>" % (colorName, hexCode))
+	return "<color name=\"material%s\">%s</color>" % (colorName, hexCode)
 
 def ios_color(colorName, hexCode):
 	rComp = int(hexCode[1:3], 16)
 	gComp = int(hexCode[3:5], 16)
 	bComp = int(hexCode[5:], 16)
-	print("static let %s = UIColor(red: %.3f, green: %.3f, blue: %.3f, alpha:1)" % (colorName, rComp/256, gComp/256, bComp/256))
+	return "static let %s = UIColor(red: %.3f, green: %.3f, blue: %.3f, alpha:1)" % (colorName, rComp/256, gComp/256, bComp/256)
+
+def row_color(colorName, hexCode):
+	androidColor = html.escape(android_color(colorName, hexCode))
+	iosColor = html.escape(ios_color(colorName, hexCode))
+	content = "<strong>%s</strong><br/> Android: <br/><code>%s</code><br/><br/> iOS: <br/><code>%s</code>" % (colorName, androidColor, iosColor)
+	return "<tr><td bgcolor=\"%s\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>%s</td></tr>" % (hexCode, content)
 
 # ===========
 # = PROGRAM =
@@ -396,12 +402,20 @@ if (platform == "android"):
 	for groupName, group in materialGroups.items():
 		print("<!-- %s Colors -->" % (groupName))
 		for colorName, hexCode in group.items():
-			android_color(colorName, hexCode)
+			print(android_color(colorName, hexCode))
 elif (platform == "ios"):
 	for groupName, group in materialGroups.items():
 		print("// %s Colors" % (groupName))
 		for colorName, hexCode in group.items():
-			ios_color(colorName, hexCode)
+			print(ios_color(colorName, hexCode))
 else:
-	print("Unknown platform")
+	print("<table>")
+	print("<tr>")
+	print("<th width=\"50\">Color</th>")
+	print("<th>Details</th>")
+	print("</tr>")
+	for groupName, group in materialGroups.items():
+		for colorName, hexCode in group.items():
+			print(row_color(colorName, hexCode))
+	print("</table>")
 
