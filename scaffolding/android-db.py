@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse, random
+import argparse, random, sys
 
 # ====================
 # = ARGUMENTS PARSER =
@@ -17,7 +17,9 @@ parser.add_argument('--columns','-c',
 	dest='columns',
 	required=True,
 	nargs=1,
-	help="A single quoted list of column definitions (excluding primary key _ID) for the model, separated by semicolon. Example: 'name:varchar(100);age:smallint;weight:decimal(4,2)'")
+	help="A single quoted list of column definitions (excluding primary key _ID) for the model, "+
+	"separated by semicolon. Valid types are: integer, real, text. Indexed columns can be "+
+	"indicated by adding 'i' to definition. Example: 'name:text;weight:real;profile_id:integer:i'")
 
 args = parser.parse_args()
 
@@ -34,10 +36,10 @@ def parse_columns(colsString):
 	for i in range( len(columns) ):
 		column = columns[i].strip()
 		parts = column.split(':')
-		if(len(parts) == 2):
-			definitions[ parts[0] ] = {'type': parts[1].upper(), 'indexed': False}
+		indexed = False
 		if(len(parts) == 3 and parts[2] == "i"):
-			definitions[ parts[0] ] = {'type': parts[1].upper(), 'indexed': True}
+			indexed = True
+		definitions[ parts[0] ] = {'type': parts[1].upper(), 'indexed': indexed}
 	return definitions
 	
 def camel_case_str(planeString):
@@ -66,14 +68,43 @@ def print_header(title, size):
 	print("// " + " ".rjust(25, "*") + title.center(size, " ") + " ".ljust(25,"*"))
 	print("")
 
+validDataTypes = ["INTEGER","REAL","TEXT"]
+javaDefinitions = {
+	'INTEGER': {
+		'type': "long",
+		'value': "0",
+		'dbFunction': "getLong"
+	},
+	'REAL':{
+		'type': "double",
+		'value': "0d",
+		'dbFunction': "getDouble"
+	},
+	'TEXT':{
+		'type': "String",
+		'value': "\"\"",
+		'dbFunction': "getString"
+	}
+}
+
 # ==================
 # = IMPLEMENTATION =
 # ==================
 colDefs = parse_columns(columns)
+
+# validate column types
+colTypesValid = True
 indexedColumns = []
 for column in colDefs.keys():
 	if(colDefs[column]['indexed']):
 		indexedColumns.append(column)
+	colType = colDefs[column]['type']
+	if colType not in validDataTypes:
+		colTypesValid = False
+
+if not colTypesValid:
+	print("Please use valid data types.")
+	sys.exit()
 
 model = model.lower()
 modelClass = class_name_str(model)
@@ -118,12 +149,12 @@ print_header("Model data class", 30)
 print("public class %sData {" % (modelClass))
 print("\tpublic long localId;")
 for column in colDefs.keys():
-	print("\tpublic String %s;" % (camel_case_str(column)))
+	print("\tpublic %s %s;" % (javaDefinitions[ colDefs[column]['type'] ]['type'], camel_case_str(column)))
 print("")
 print("\tpublic %sData() {" % (modelClass))
 print("\t\tlocalId = 0;")
 for column in colDefs.keys():
-	print("\t\t%s = \"\";" % (camel_case_str(column)))
+	print("\t\t%s = %s;" % (camel_case_str(column), javaDefinitions[ colDefs[column]['type'] ]['value']))
 print("\t}")
 print("}")
 print("\n")
@@ -162,6 +193,8 @@ print("\n")
 
 print("\t@Override")
 print("\tpublic void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {")
+print("\t\t// create tables")
+print("\t\tdb.execSQL(%sSchema.SQL_CREATE_TABLE);" % (modelClass))
 print("\t\t// check table structure")
 print("\t\tcheckTableStructure(db, %sSchema.TABLE_NAME, %sSchema.COL_DEFS, %sSchema.COL_IDX);" % (modelClass, modelClass, modelClass))
 print("\t}")
@@ -229,13 +262,13 @@ print("\t\treturn dbTables.contains(tableName);")
 print("\t}")
 print("\n")
 
-print_header("MODEL DB OPERATIONS", 30)
+print_header("%s OPERATIONS" % (modelTableUpper), 30)
 
 print("\tpublic ArrayList<%sData> get%ss() {" % (modelClass, modelClass))
 print("\t\tArrayList<%sData> %ss = new ArrayList<>();" % (modelClass, modelObj))
 print("\t\t//if (!tableExists(%sSchema.TABLE_NAME)) return %ss;" % (modelClass, modelObj))
 print("\t\tSQLiteDatabase readDb = getReadableDatabase();")
-print("\t\tCursor cursor = readDb.query(OwnerSchema.TABLE_NAME,")
+print("\t\tCursor cursor = readDb.query(%sSchema.TABLE_NAME," % (modelClass))
 print("\t\t\t\tnull, // The columns to return, null for all columns")
 print("\t\t\t\tnull, // The columns for the WHERE clause")
 print("\t\t\t\tnull, // The values for the WHERE clause")
@@ -247,7 +280,8 @@ print("\t\twhile (cursor.moveToNext()) {")
 print("\t\t\t%sData %s = new %sData();" % (modelClass, modelObj, modelClass))
 print("\t\t\t%s.localId = cursor.getLong(cursor.getColumnIndex(PRIMARY_KEY_FIELD));" % (modelObj))
 for column in colDefs.keys():
-	print("\t\t\t%s.%s = cursor.getString(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % (modelObj, camel_case_str(column), modelClass, column.upper()))
+	print("\t\t\t%s.%s = cursor.%s(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % 
+	(modelObj, camel_case_str(column), javaDefinitions[ colDefs[column]['type'] ]['dbFunction'], modelClass, column.upper()) )
 print("\t\t\t%ss.add(%s);" % (modelObj, modelObj))
 print("\t\t}")
 print("\t\tcursor.close();")
@@ -260,7 +294,7 @@ print("\tpublic %sData get%s(long localId) {" % (modelClass, modelClass))
 print("\t\t%sData %s = new %sData();" % (modelClass, modelObj, modelClass))
 print("\t\t//if (!tableExists(%sSchema.TABLE_NAME)) return %s;" % (modelClass, modelObj))
 print("\t\tSQLiteDatabase readDb = getReadableDatabase();")
-print("\t\tCursor cursor = readDb.query(OwnerSchema.TABLE_NAME,")
+print("\t\tCursor cursor = readDb.query(%sSchema.TABLE_NAME," % (modelClass))
 print("\t\t\t\tnull, // The columns to return, null for all columns")
 print("\t\t\t\tPRIMARY_KEY_FIELD + \" = ?\", // The columns for the WHERE clause")
 print("\t\t\t\tnew String[]{Long.toString(localId)}, // The values for the WHERE clause")
@@ -271,7 +305,8 @@ print("\t\t);")
 print("\t\tif (cursor.moveToNext()) {")
 print("\t\t\t%s.localId = cursor.getLong(cursor.getColumnIndex(PRIMARY_KEY_FIELD));" % (modelObj))
 for column in colDefs.keys():
-	print("\t\t\t%s.%s = cursor.getString(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % (modelObj, camel_case_str(column), modelClass, column.upper()))
+	print("\t\t\t%s.%s = cursor.%s(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % 
+	(modelObj, camel_case_str(column), javaDefinitions[ colDefs[column]['type'] ]['dbFunction'], modelClass, column.upper()) )
 print("\t\t}")
 print("\t\tcursor.close();")
 print("\t\treadDb.close();")
