@@ -302,7 +302,7 @@ print("\t\t\t\tnull, // don't group the rows")
 print("\t\t\t\tnull, // don't filter by row groups")
 print("\t\t\t\tnull  // The SORT BY string")
 print("\t\t);")
-print("\t\tif (cursor.moveToNext()) {")
+print("\t\tif (cursor.moveToFirst()) {")
 print("\t\t\t%s.localId = cursor.getLong(cursor.getColumnIndex(PRIMARY_KEY_FIELD));" % (modelObj))
 for column in colDefs.keys():
 	print("\t\t\t%s.%s = cursor.%s(cursor.getColumnIndex(%sSchema.COLUMN_NAME_%s));" % 
