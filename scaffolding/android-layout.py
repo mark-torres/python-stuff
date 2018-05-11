@@ -43,8 +43,11 @@ def find_elements(domNode):
 	# check node
 	if domNode.hasAttributes():
 		elemClass = domNode.tagName
+		classParts = elemClass.split(".")
+		if len(classParts) > 1:
+			elemClass = classParts[-1:][0]
 		elemId = domNode.getAttribute('android:id')
-		idRe = re.compile(r'^@\+id\/(\w\w+)$')
+		idRe = re.compile(r'^@\+id\/([a-zA-Z]\w+)$')
 		matches = idRe.search(elemId)
 		if matches != None:
 			elemId = matches.group(1)
