@@ -6,7 +6,7 @@ from datetime import datetime
 # = SET LOGGING LEVEL =
 # =====================
 
-logging.basicConfig(level=logging.INFO, format= '%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.ERROR, format= '%(asctime)s - %(levelname)s - %(message)s')
 
 # ====================
 # = ARGUMENTS PARSER =
@@ -51,6 +51,7 @@ logging.info( "Using KEY = '%s' EMAIL = '%s' PASSWD = '%s'" % (apiKey, email, pa
 now = datetime.now()
 keyName = "Python " + now.strftime("%Y-%m-%d %H:%M:%S")
 loginKeyEndpoint = "https://api.urvenue.me/v1/users/loginkey/json/post"
+tmpFilename = "login_key.tmp"
 postData = {
 	"apikey": apiKey,
 	"sourcecode": "users",
@@ -70,7 +71,8 @@ try:
 	# save response text
 	cwd = os.getcwd()
 	if os.access(cwd,os.W_OK):
-		filename = os.path.join(cwd, "login_key.tmp")
+		logging.info("Saving response to '%s'..." % (tmpFilename) )
+		filename = os.path.join(cwd, tmpFilename)
 		fh = open(filename, "w")
 		fh.write(responseText + "\n")
 		fh.close()
