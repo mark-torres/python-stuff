@@ -3,7 +3,20 @@
 # https://www.tutorialkart.com/python/python-xml-parsing/
 
 import xml.etree.ElementTree as ET
-import sys
+import sys, argparse, os
+
+parser = argparse.ArgumentParser(description='Parses a MSN conversation log in XML format.')
+
+parser.add_argument('--file','-f',
+	dest='logFile',
+	required=True,
+	nargs=1,
+	help="Log file to be parsed.")
+
+args = parser.parse_args()
+
+logFile = args.logFile[0]
+
 
 #====================
 def msn_parse_message(msg_xml):
@@ -28,8 +41,15 @@ def msn_message_text(message):
 	)
 	print(message['text'])
 #====================
+if not os.path.exists(logFile):
+	print("The file does not exist")
+	sys.exit()
 
-tree = ET.parse("sample_msn.xml")
+if not os.access(logFile, os.R_OK):
+	print("The file is not readable")
+	sys.exit()
+
+tree = ET.parse(logFile)
 root = tree.getroot()
 
 # check tree root
