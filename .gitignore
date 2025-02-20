@@ -2,3 +2,4 @@
 *.orig
 *.tmp
 tmp
+.idea
